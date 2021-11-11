@@ -2,6 +2,7 @@ package com.uma.transportesuma.service;
 
 import com.uma.transportesuma.document.User;
 import com.uma.transportesuma.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,14 +10,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
-
     @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final UserRepository userRepository;
 
     public List<User> findAllUsers() {
         return userRepository.findAll();

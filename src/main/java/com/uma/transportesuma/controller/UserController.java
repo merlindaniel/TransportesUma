@@ -2,6 +2,7 @@ package com.uma.transportesuma.controller;
 
 import com.uma.transportesuma.document.User;
 import com.uma.transportesuma.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,14 +11,11 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/users")
+@AllArgsConstructor
 public class UserController {
 
-    private UserService userService;
-
     @Autowired
-    public void setUserService(UserService userService) {
-        this.userService = userService;
-    }
+    private final UserService userService;
 
     @GetMapping("/")
     public List<User> findAllUsers() {
