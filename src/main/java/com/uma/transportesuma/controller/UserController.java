@@ -10,8 +10,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/users")
+@RequestMapping(path = "/api/users/")
 @AllArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     @Autowired
@@ -36,6 +37,6 @@ public class UserController {
     public void deleteUser(@PathVariable String id) {
         Optional<User> optUser = userService.findUser(id);
 
-        optUser.ifPresent(user -> userService.removeUser(user));
+        optUser.ifPresent(userService::removeUser);
     }
 }
