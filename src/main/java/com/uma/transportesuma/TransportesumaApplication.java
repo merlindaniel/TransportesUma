@@ -35,6 +35,9 @@ public class TransportesumaApplication {
 	@Bean
 	CommandLineRunner runner(@Autowired UserService userService) {
 		return args -> {
+			if (false)
+				userService.removeAllUsers();
+
 			if (false) {
 				User user = new User("zodd", "zodd@gmail.com", "123");
 				userService.addUser(user);

@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,9 +46,7 @@ public class UserService {
     }
 
     public User addUser(User user) {
-        userRepository.save(user);
-
-        return user;
+        return userRepository.save(user);
     }
 
     public void removeUser(User user) {
@@ -56,5 +55,19 @@ public class UserService {
 
     public void removeAllUsers() {
         userRepository.deleteAll();
+    }
+
+    public User updateUser(String id, User user) {
+        Optional<User> optUserInBD = findUserById(user.getId());
+        if (optUserInBD.isPresent()) {
+            User userInBD = optUserInBD.get();
+            userInBD.setUsername(user.getUsername());
+            userInBD.setEmail(user.getEmail());
+            userInBD.setPassword(user.getPassword());
+
+            return userRepository.save(userInBD);
+        }
+
+        return null;
     }
 }

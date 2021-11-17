@@ -54,7 +54,7 @@ public class OpenDataController {
             }
 
 
-            return ResponseEntity.status(HttpStatus.ACCEPTED).body(listaLugares);
+            return ResponseEntity.status(HttpStatus.OK).body(listaLugares);
 
 
         } catch (Exception ex){

@@ -4,6 +4,8 @@ import com.uma.transportesuma.document.User;
 import com.uma.transportesuma.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,24 +20,52 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/")
-    public List<User> findAllUsers() {
-        return userService.findAllUsers();
+    public ResponseEntity<List<User>> findAllUsers() {
+        try {
+            return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/{id}")
-    public User findUser(@PathVariable String id) {
-        return userService.findUser(id).orElse(null);
+    public ResponseEntity<User> findUser(@PathVariable final String id) {
+        try {
+            return new ResponseEntity<>(userService.findUser(id).get(), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping("/")
-    public User addUser(@RequestBody User user) {
-        return userService.addUser(user);
+    public ResponseEntity<User> addUser(@RequestBody final User user) {
+        try {
+            return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable String id) {
-        Optional<User> optUser = userService.findUser(id);
+    public ResponseEntity<User> deleteUser(@PathVariable final String id) {
+        try {
+            Optional<User> optUser = userService.findUser(id);
+            userService.removeUser(optUser.get());
 
-        optUser.ifPresent(userService::removeUser);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable final String id, @RequestBody User user) {
+        User updatedUser = userService.updateUser(id, user);
+
+        if (updatedUser != null) {
+            return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
