@@ -154,9 +154,8 @@ public class JourneyController {
         try {
             Journey journey = journeyService.findJourneyById(journeyId).get();
             User participant = userService.findUser(participantId).get();
-            journeyService.removeParticipant(journey, participant);
 
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(journeyService.removeParticipant(journey, participant), HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
