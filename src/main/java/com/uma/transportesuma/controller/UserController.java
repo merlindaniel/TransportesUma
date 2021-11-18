@@ -13,7 +13,8 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/users/")
-@AllArgsConstructor//@CrossOrigin(origins = "http://localhost:3000")
+@AllArgsConstructor
+//@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
 
     @Autowired
@@ -59,7 +60,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable final String id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@PathVariable final String id, @RequestBody final User user) {
         User updatedUser = userService.updateUser(id, user);
 
         if (updatedUser != null) {

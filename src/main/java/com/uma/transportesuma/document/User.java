@@ -1,14 +1,22 @@
 package com.uma.transportesuma.document;
 
 import com.mongodb.lang.NonNull;
-import lombok.AllArgsConstructor;
+import com.uma.transportesuma.document.vehicle.Vehicle;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@ToString
 @Document(collection = "User")
 public class User implements Serializable {
 
@@ -27,72 +35,45 @@ public class User implements Serializable {
     @NonNull
     private String password;
 
+    @NonNull
+    private Set<String> organizedJourneys;
+
+    @NonNull
+    private Set<String> participatedJourneys;
+
+    @NonNull
+    private Set<String> vehicles;
+
     public User(@NonNull String username, @NonNull String email, @NonNull String password) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.organizedJourneys = new HashSet<>();
+        this.participatedJourneys = new HashSet<>();
+        this.vehicles = new HashSet<>();
     }
 
-    public User() {}
-
-    @NonNull
-    public String getId() {
-        return id;
+    public void addOrganizedJourney(Journey journey) {
+        organizedJourneys.add(journey.getId());
     }
 
-    public void setId(@NonNull String id) {
-        this.id = id;
+    public void removeOrganizedJourney(Journey journey) {
+        organizedJourneys.remove(journey.getId());
     }
 
-    @NonNull
-    public String getUsername() {
-        return username;
+    public void addParticipatedJourney(Journey journey) {
+        participatedJourneys.add(journey.getId());
     }
 
-    public void setUsername(@NonNull String username) {
-        this.username = username;
+    public void removeParticipatedJourney(Journey journey) {
+        participatedJourneys.remove(journey.getId());
     }
 
-    @NonNull
-    public String getPassword() {
-        return password;
+    public void addVehicle(Vehicle vehicle) {
+        vehicles.add(vehicle.getId());
     }
 
-    public void setPassword(@NonNull String password) {
-        this.password = password;
-    }
-
-    @NonNull
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(@NonNull String email) {
-        this.email = email;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        return id.equals(user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return id.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                '}';
+    public void removeVehicle(Vehicle vehicle) {
+        vehicles.remove(vehicle.getId());
     }
 }

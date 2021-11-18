@@ -2,7 +2,7 @@ package com.uma.transportesuma.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.uma.transportesuma.vo.Lugar;
+import com.uma.transportesuma.vo.Place;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
@@ -25,10 +25,11 @@ public class OpenDataController {
     @Qualifier("restTemplate")
     private RestTemplate restTemplate;
 
-    //latitud y longitud separadas con una coma. Ejemplo: .../discover/01.23,04.56/facultad
+    // Latitud y longitud separadas con una coma.
+    // Ejemplo: .../discover/01.23,04.56/facultad
     @GetMapping("/discover/{latlng}/{name}")
-    public ResponseEntity<List<Lugar>> getPlacesByLatLngAndName(@PathVariable("latlng") String latAndLng,
-                                                          @PathVariable("name") String name){
+    public ResponseEntity<List<Place>> getPlacesByLatLngAndName(@PathVariable("latlng") String latAndLng,
+                                                                @PathVariable("name") String name){
 
         try {
             Double lat = Double.parseDouble(latAndLng.split(",")[0]);
@@ -40,21 +41,21 @@ public class OpenDataController {
             JsonNode map = jsonResponse.getBody().get("items");
 
             JsonNode arrNode = new ObjectMapper().readTree(String.valueOf(map));
-            List<Lugar> listaLugares = new ArrayList<>();
+            List<Place> places = new ArrayList<>();
             if(arrNode.isArray()){
                 for(JsonNode obj : arrNode){
-                    Lugar l = new Lugar();
+                    Place l = new Place();
                     l.setTitle(obj.get("title").asText());
                     l.setAddress(obj.get("address").get("label").asText());
                     l.setLat(obj.get("position").get("lat").asDouble());
                     l.setLng(obj.get("position").get("lng").asDouble());
                     l.setDistance(obj.get("distance").asInt());
-                    listaLugares.add(l);
+                    places.add(l);
                 }
             }
 
 
-            return ResponseEntity.status(HttpStatus.OK).body(listaLugares);
+            return ResponseEntity.status(HttpStatus.OK).body(places);
 
 
         } catch (Exception ex){

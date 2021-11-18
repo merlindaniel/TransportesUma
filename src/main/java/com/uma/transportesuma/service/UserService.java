@@ -17,6 +17,8 @@ public class UserService {
     @Autowired
     private final UserRepository userRepository;
 
+    // ---------- Queries ----------
+
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
@@ -45,6 +47,8 @@ public class UserService {
         return optUser;
     }
 
+    // ---------- Operations ----------
+
     public User addUser(User user) {
         return userRepository.save(user);
     }
@@ -64,10 +68,17 @@ public class UserService {
             userInBD.setUsername(user.getUsername());
             userInBD.setEmail(user.getEmail());
             userInBD.setPassword(user.getPassword());
+            userInBD.setOrganizedJourneys(user.getOrganizedJourneys());
+            userInBD.setParticipatedJourneys(user.getParticipatedJourneys());
+            userInBD.setVehicles(user.getVehicles());
 
             return userRepository.save(userInBD);
         }
 
         return null;
+    }
+
+    public User updateUser(User user) {
+        return updateUser(user.getId(), user);
     }
 }
