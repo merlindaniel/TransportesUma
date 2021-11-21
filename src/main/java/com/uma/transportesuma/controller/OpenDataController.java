@@ -21,12 +21,27 @@ import java.util.List;
 @RequestMapping("/api/opendata")
 public class OpenDataController {
 
+    private final String HERE_API_KEY = "MXq1nXbaUjtpL5d-EnteM0B3-EoiXFrZXgIqd5nry2g";
+    private final String HERE_PREFFIX_API_DISCOVER = "https://discover.search.hereapi.com/v1/discover";
+
+
     @Autowired
     @Qualifier("restTemplate")
     private RestTemplate restTemplate;
 
-    // Latitud y longitud separadas con una coma.
-    // Ejemplo: .../discover/01.23,04.56/facultad
+
+    private String getUrlHereApiDiscover(Double lat, Double lng, String countryPrefix, String name, int limit){
+        return this.HERE_PREFFIX_API_DISCOVER + "?at=" + lat + "," + lng + "&limit=" + limit + "&q=+" + name + "+&in=countryCode:" + countryPrefix + "&apiKey=" + this.HERE_API_KEY;
+    }
+
+
+    /**
+     * Devuelve una lista de lugares (vease la clase Place) dados una latitud, longitud y un nombre.
+     * Ejemplo de consulta: .../api/opendata/discover/01.23,04.56/facultad
+     *
+     * @param latAndLng Latitud y longitud separadas por una coma. Ejemplo: 01.23,04.56
+     * @param name Nombre completo o parcial de un lugar. Ejemplos: "Facul", "Facultad"...
+     */
     @GetMapping("/discover/{latlng}/{name}")
     public ResponseEntity<List<Place>> getPlacesByLatLngAndName(@PathVariable("latlng") String latAndLng,
                                                                 @PathVariable("name") String name){
@@ -34,10 +49,9 @@ public class OpenDataController {
         try {
             Double lat = Double.parseDouble(latAndLng.split(",")[0]);
             Double lng = Double.parseDouble(latAndLng.split(",")[1]);
-            //36.715870,-4.477678
 
-            String cadenaMeDaPereza = "https://discover.search.hereapi.com/v1/discover?at="+lat+","+lng+"&limit=10&q=+"+ name +"+&in=countryCode:ESP&apiKey=MXq1nXbaUjtpL5d-EnteM0B3-EoiXFrZXgIqd5nry2g";
-            ResponseEntity<JsonNode> jsonResponse = restTemplate.exchange(cadenaMeDaPereza, HttpMethod.GET, null, JsonNode.class);
+            String urlApiHere = this.getUrlHereApiDiscover(lat, lng, "ESP", name, 10);
+            ResponseEntity<JsonNode> jsonResponse = restTemplate.exchange(urlApiHere, HttpMethod.GET, null, JsonNode.class);
             JsonNode map = jsonResponse.getBody().get("items");
 
             JsonNode arrNode = new ObjectMapper().readTree(String.valueOf(map));
@@ -54,13 +68,17 @@ public class OpenDataController {
                 }
             }
 
-
             return ResponseEntity.status(HttpStatus.OK).body(places);
-
 
         } catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
     }
+
+
+
+
+
+
 }
