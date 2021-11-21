@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.uma.transportesuma.dto.FuelStation;
 import com.uma.transportesuma.dto.Place;
 import com.uma.transportesuma.dto.Route;
 import com.uma.transportesuma.vo.LatLng;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -40,18 +43,19 @@ public class OpenDataController {
     private final String TOMTOM_API_KEY ="wSGBFXYcE42mlcntsL9LXVKSKGs9ikUy";
     private final String TOMTOM_PREFFIX_API_ROUTING="https://api.tomtom.com/routing/1/calculateRoute/";
 
+    //API G
+    private final String GOB_ESP_API_URL_FUEL_PRICE = "https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/";
 
-    private final HttpClient httpClient = HttpClient.newBuilder()
-            .version(HttpClient.Version.HTTP_2)
-            .build();
+    //HTTP Client Java 11
+    private HttpClient httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_2)
+                .build();
+
 
 
     @Autowired
     @Qualifier("restTemplate")
     private RestTemplate restTemplate;
-
-
-
 
 
     /**
@@ -117,20 +121,14 @@ public class OpenDataController {
             @PathVariable("latDst") Double latDst,
             @PathVariable("lngDst") Double lngDst){
 
-        try{
+        try {
 
-            HttpRequest request = HttpRequest.newBuilder()
-                    .GET()
-                    .uri(URI.create(this.getUrlTomTomApiRouting(latSrc, lngSrc, latDst, lngDst)))
-                    .setHeader("Accept", "application/json")
-                    .build();
+            JsonObject jsonObjectReponse = this.getJsonObjectByUrl(this.getUrlTomTomApiRouting(latSrc, lngSrc, latDst, lngDst));
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             Gson gson = new Gson();
 
-            JsonObject jsonObjectAll = JsonParser.parseString(response.body()).getAsJsonObject();
 
-            JsonObject jsonSummaryAndPoints = jsonObjectAll
+            JsonObject jsonSummaryAndPoints = jsonObjectReponse
                     .get("routes").getAsJsonArray()
                     .get(0).getAsJsonObject()
                     .get("legs").getAsJsonArray()
@@ -143,10 +141,9 @@ public class OpenDataController {
             points.forEach(elem -> latLngs.add(gson.fromJson(elem, LatLng.class)));
 
 
-
             return ResponseEntity.status(HttpStatus.OK).body(new Route(rs, latLngs));
 
-        }catch (Exception ex){
+        } catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
@@ -171,6 +168,65 @@ public class OpenDataController {
                 "&key=" + this.TOMTOM_API_KEY;
     }
 
+
+    /**
+     * Devuelve los precios que posee cada gasolinera en españa.
+     * Nota: La llamada a este url es algo tena debido a la gran cantidad de datos.
+     *
+     * @return Devuelve una lista de gasolineras. Vease FuelStation
+     */
+    @GetMapping("/fuelstation")
+    private ResponseEntity<List<FuelStation>> getFuelStationsEsp(){
+        try {
+            Gson gson = new Gson();
+            JsonObject jsonObjectResponse = this.getJsonObjectByUrl(this.GOB_ESP_API_URL_FUEL_PRICE);
+
+            JsonArray jsonFuelStationList = jsonObjectResponse.get("ListaEESSPrecio").getAsJsonArray();
+
+            List<FuelStation> fuelStationList = new ArrayList<>();
+
+            jsonFuelStationList.forEach(elem -> {
+                FuelStation fs = gson.fromJson(elem.getAsJsonObject(), FuelStation.class);
+                Double lat, lng;
+                try {
+                    String slat = elem.getAsJsonObject().get("Latitud").getAsString().replace(",", ".");
+                    String slng = elem.getAsJsonObject().get("Longitud (WGS84)").getAsString().replace(",", ".");
+                    lat = Double.parseDouble(slat);
+                    lng = Double.parseDouble(slng);
+                } catch (NumberFormatException ex){
+                    lat = null;
+                    lng = null;
+                }
+                fs.setLatLng(new LatLng(lat, lng));
+                fuelStationList.add(fs);
+            });
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(fuelStationList);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+
+    private JsonObject getJsonObjectByUrl(String url) throws Exception{
+
+        /*HttpClient httpClient = HttpClient.newBuilder()
+                .sslContext(SSLContext.getDefault())
+                .sslParameters(new SSLParameters())
+                .version(HttpClient.Version.HTTP_2)
+                .build();*/
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(url))
+                .setHeader("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return JsonParser.parseString(response.body()).getAsJsonObject();
+    }
 
 
 
