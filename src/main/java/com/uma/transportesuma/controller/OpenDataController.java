@@ -51,13 +51,12 @@ public class OpenDataController {
     private RestTemplate restTemplate;
 
 
-    private String getUrlHereApiDiscover(Double lat, Double lng, String countryPrefix, String name, int limit){
-        return this.HERE_PREFFIX_API_DISCOVER + "?at=" + lat + "," + lng + "&limit=" + limit + "&q=+" + name + "+&in=countryCode:" + countryPrefix + "&apiKey=" + this.HERE_API_KEY;
-    }
+
 
 
     /**
      * Devuelve una lista de lugares (vease la clase Place) dados una latitud, longitud y un nombre.
+     * Hace uso de la API de HERE
      * Ejemplo de consulta: .../api/opendata/discover/01.23,04.56/facultad
      *
      * @param latAndLng Latitud y longitud separadas por una coma. Ejemplo: 01.23,04.56
@@ -97,8 +96,20 @@ public class OpenDataController {
 
     }
 
+    private String getUrlHereApiDiscover(Double lat, Double lng, String countryPrefix, String name, int limit){
+        return this.HERE_PREFFIX_API_DISCOVER + "?at=" + lat + "," + lng + "&limit=" + limit + "&q=+" + name + "+&in=countryCode:" + countryPrefix + "&apiKey=" + this.HERE_API_KEY;
+    }
 
 
+    /**
+     * Devuelve una ruta (vease la clase Route) con el camino mas corto y mas rapido entre un origen
+     * y un destino. Hace uso de la API de TomTom
+     * @param latSrc latitud origen
+     * @param lngSrc longitud origen
+     * @param latDst latitud destino
+     * @param lngDst longitud destino
+     * @return Devuelve un objeto de clase Route. Poseera la lista de puntos (points) por
+     */
     @GetMapping("/route/{latSrc}/{lngSrc}/{latDst}/{lngDst}")
     public ResponseEntity<Route> getRouteByLatLng(
             @PathVariable("latSrc") Double latSrc,
@@ -141,6 +152,7 @@ public class OpenDataController {
 
 
     }
+
 
     private String getUrlTomTomApiRouting(Double latSrc, Double lngSrc, Double latDst, Double lngDst){
         return this.TOMTOM_PREFFIX_API_ROUTING + latSrc + "," + lngSrc + ":" + latDst + "," + lngDst +
