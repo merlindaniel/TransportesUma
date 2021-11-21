@@ -2,7 +2,14 @@ package com.uma.transportesuma.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.uma.transportesuma.vo.Place;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.uma.transportesuma.dto.Place;
+import com.uma.transportesuma.dto.Route;
+import com.uma.transportesuma.vo.LatLng;
+import com.uma.transportesuma.vo.RouteSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
@@ -14,6 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,8 +32,18 @@ import java.util.List;
 @RequestMapping("/api/opendata")
 public class OpenDataController {
 
+    //API HERE
     private final String HERE_API_KEY = "MXq1nXbaUjtpL5d-EnteM0B3-EoiXFrZXgIqd5nry2g";
     private final String HERE_PREFFIX_API_DISCOVER = "https://discover.search.hereapi.com/v1/discover";
+
+    //API TOMTOM
+    private final String TOMTOM_API_KEY ="wSGBFXYcE42mlcntsL9LXVKSKGs9ikUy";
+    private final String TOMTOM_PREFFIX_API_ROUTING="https://api.tomtom.com/routing/1/calculateRoute/";
+
+
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_2)
+            .build();
 
 
     @Autowired
@@ -77,6 +98,66 @@ public class OpenDataController {
     }
 
 
+
+    @GetMapping("/route/{latSrc}/{lngSrc}/{latDst}/{lngDst}")
+    public ResponseEntity<Route> getRouteByLatLng(
+            @PathVariable("latSrc") Double latSrc,
+            @PathVariable("lngSrc") Double lngSrc,
+            @PathVariable("latDst") Double latDst,
+            @PathVariable("lngDst") Double lngDst){
+
+        try{
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .GET()
+                    .uri(URI.create(this.getUrlTomTomApiRouting(latSrc, lngSrc, latDst, lngDst)))
+                    .setHeader("Accept", "application/json")
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            Gson gson = new Gson();
+
+            JsonObject jsonObjectAll = JsonParser.parseString(response.body()).getAsJsonObject();
+
+            JsonObject jsonSummaryAndPoints = jsonObjectAll
+                    .get("routes").getAsJsonArray()
+                    .get(0).getAsJsonObject()
+                    .get("legs").getAsJsonArray()
+                    .get(0).getAsJsonObject();
+
+            RouteSummary rs = gson.fromJson(jsonSummaryAndPoints.get("summary"), RouteSummary.class);
+
+            List<LatLng> latLngs = new ArrayList<>();
+            JsonArray points = jsonSummaryAndPoints.get("points").getAsJsonArray();
+            points.forEach(elem -> latLngs.add(gson.fromJson(elem, LatLng.class)));
+
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(new Route(rs, latLngs));
+
+        }catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+
+    }
+
+    private String getUrlTomTomApiRouting(Double latSrc, Double lngSrc, Double latDst, Double lngDst){
+        return this.TOMTOM_PREFFIX_API_ROUTING + latSrc + "," + lngSrc + ":" + latDst + "," + lngDst +
+                "/json?" +
+                "instructionsType=coded" +
+                "&computeBestOrder=true" +
+                "&routeRepresentation=polyline" +
+                "&computeTravelTimeFor=none" +
+                "&report=effectiveSettings" +
+                "&routeType=fastest" +
+                "&traffic=true" +
+                "&avoid=unpavedRoads" +
+                "&travelMode=car" +
+                "&vehicleCommercial=false" +
+                "&vehicleEngineType=combustion" +
+                "&key=" + this.TOMTOM_API_KEY;
+    }
 
 
 

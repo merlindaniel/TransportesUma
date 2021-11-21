@@ -1,4 +1,4 @@
-package com.uma.transportesuma.vo;
+package com.uma.transportesuma.dto;
 
 import lombok.*;
 

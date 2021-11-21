@@ -1,7 +1,7 @@
 package com.uma.transportesuma.document;
 
 import com.mongodb.lang.NonNull;
-import com.uma.transportesuma.vo.Place;
+import com.uma.transportesuma.dto.Place;
 import com.uma.transportesuma.document.vehicle.Vehicle;
 import lombok.*;
 import org.springframework.data.annotation.Id;
