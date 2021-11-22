@@ -276,7 +276,17 @@ public class OpenDataController {
     }
 
 
-
+    /**
+     * Proporciona una ruta desde un origen hasta un destino parando por una gasolinera. Se debe especificar
+     * la distancia maxima para desviarte de tu camino original.
+     *
+     * @param latSrc Latitud del origen.
+     * @param lngSrc Longitud del origen.
+     * @param latDst Latitud del destino.
+     * @param lngDst Longitud del destino.
+     * @param radius Distancia maxima en METROS que puedes desviarte de tu camino original.
+     * @return Devuelve una lista de caminos. Vease Route.
+     */
     @GetMapping("/get/route/stopping/fuelstation/{latSrc}/{lngSrc}/{latDst}/{lngDst}/{radius}") //{nTimes}
     private ResponseEntity<List<Route>> getRouteByLatLngAndStoppingFuelStation(
             @PathVariable("latSrc") Double latSrc,
