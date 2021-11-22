@@ -42,7 +42,7 @@ public class OpenDataController {
     private final String TOMTOM_API_KEY ="wSGBFXYcE42mlcntsL9LXVKSKGs9ikUy";
     private final String TOMTOM_PREFFIX_API_ROUTING="https://api.tomtom.com/routing/1/calculateRoute/";
 
-    //API G
+    //API DEL GOBIERNO
     private final String GOB_ESP_API_URL_FUEL_PRICE = "https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/";
     private final int GOB_ESP_UPDATE_TIME_MINUTES_API = 1;
 
@@ -304,7 +304,7 @@ public class OpenDataController {
      * @param radius Distancia maxima en METROS que puedes desviarte de tu camino original.
      * @return Devuelve una lista de caminos. Vease Route.
      */
-    @GetMapping("/get/route/stopping/fuelstation/{latSrc}/{lngSrc}/{latDst}/{lngDst}/{radius}") //{nTimes}
+    @GetMapping("/get/route/stopping/closer/fuelstation/{latSrc}/{lngSrc}/{latDst}/{lngDst}/{radius}") //{nTimes}
     private ResponseEntity<List<Route>> getRouteByLatLngAndStoppingFuelStation(
             @PathVariable("latSrc") Double latSrc,
             @PathVariable("lngSrc") Double lngSrc,
@@ -373,6 +373,8 @@ public class OpenDataController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
+
 
 
 
