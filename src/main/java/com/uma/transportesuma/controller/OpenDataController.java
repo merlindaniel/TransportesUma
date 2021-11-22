@@ -2,10 +2,7 @@ package com.uma.transportesuma.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.uma.transportesuma.dto.FuelStation;
 import com.uma.transportesuma.dto.Place;
 import com.uma.transportesuma.dto.Route;
@@ -137,7 +134,7 @@ public class OpenDataController {
      * @param lngDst longitud destino
      * @return Devuelve un objeto de clase Route. Poseera la lista de puntos (points) por
      */
-    @GetMapping("/get/route/{latSrc}/{lngSrc}/{latDst}/{lngDst}")
+    @GetMapping("/get/route/direct/{latSrc}/{lngSrc}/{latDst}/{lngDst}")
     public ResponseEntity<Route> getRouteByLatLng(
             @PathVariable("latSrc") Double latSrc,
             @PathVariable("lngSrc") Double lngSrc,
@@ -145,11 +142,8 @@ public class OpenDataController {
             @PathVariable("lngDst") Double lngDst){
 
         try {
-
-            JsonObject jsonObjectReponse = this.getJsonObjectByUrl(this.getUrlTomTomApiRouting(latSrc, lngSrc, latDst, lngDst));
-
             Gson gson = new Gson();
-            double vv = this.getDistanceByLatLng(36.714608, -4.264197, 36.713706, -4.266476);
+            JsonObject jsonObjectReponse = this.getJsonObjectByUrl(this.getUrlTomTomApiRouting(latSrc, lngSrc, latDst, lngDst));
 
             JsonObject jsonSummaryAndPoints = jsonObjectReponse
                     .get("routes").getAsJsonArray()
@@ -201,13 +195,14 @@ public class OpenDataController {
     @GetMapping("/get/fuelstation/")
     private ResponseEntity<List<FuelStation>> getFuelStationsEsp(){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(this.getFuelStationList());
+            return ResponseEntity.status(HttpStatus.OK).body(this.getFuelStationList(null, null, null));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
-    private List<FuelStation> getFuelStationList() throws Exception{
+
+    private List<FuelStation> getFuelStationList(Double latitude, Double longitude, Integer radius) throws Exception {
         Gson gson = new Gson();
         JsonObject jsonObjectResponse = this.getJsonObjectByUrl(this.GOB_ESP_API_URL_FUEL_PRICE);
 
@@ -230,8 +225,26 @@ public class OpenDataController {
             fs.setLatLng(new LatLng(lat, lng));
             fuelStationList.add(fs);
         });
-        return fuelStationList;
+
+        if(latitude==null || longitude == null || radius == null){
+            return fuelStationList;
+        } else {
+            return fuelStationList
+                    .stream()
+                    .filter(elem -> (
+                                this.getDistanceByLatLng(
+                                    elem.getLatLng().getLatitude(),
+                                    elem.getLatLng().getLongitude(),
+                                    latitude,
+                                    longitude
+                                ) <= radius.doubleValue()
+                            )
+                    )
+                    .collect(Collectors.toList());
+        }
+
     }
+
 
 
     /**
@@ -252,20 +265,90 @@ public class OpenDataController {
             @PathVariable("radius") Integer radius){
 
         try {
-            List<FuelStation> fuelStationList = this.getFuelStationList();
-            List<FuelStation> fuelStationListInsideRadius = fuelStationList
-                    .stream()
-                    .filter(elem -> (this.getDistanceByLatLng(elem.getLatLng().getLatitude(),elem.getLatLng().getLongitude(),lat,lng) <= radius.doubleValue()))
-                    .collect(Collectors.toList());
+            List<FuelStation> fuelStationList = this.getFuelStationList(lat, lng, radius);
 
-
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fuelStationListInsideRadius);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fuelStationList);
 
         } catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
     }
+
+
+
+    @GetMapping("/get/route/stopping/fuelstation/{latSrc}/{lngSrc}/{latDst}/{lngDst}/{radius}") //{nTimes}
+    private ResponseEntity<List<Route>> getRouteByLatLngAndStoppingFuelStation(
+            @PathVariable("latSrc") Double latSrc,
+            @PathVariable("lngSrc") Double lngSrc,
+            @PathVariable("latDst") Double latDst,
+            @PathVariable("lngDst") Double lngDst,
+            @PathVariable("radius") Integer radius){
+
+        try {
+
+            Route originalRoute = this.getRouteByLatLng(latSrc, lngSrc, latDst, lngDst).getBody();
+
+            double minDistance = Double.MAX_VALUE;
+            FuelStation minFuelStationDistance = null;
+
+            //iteramos por cada uno de los puntos por donde pasara el vehiculo
+            if (originalRoute != null) {
+                for(LatLng lt: originalRoute.getPoints()){
+
+                    //Obtenemos todas las gasolineras que se encuentren dentro del radio
+                    List<FuelStation> fsList = this.getFuelStationList(lt.getLatitude(), lt.getLongitude(), radius);
+
+                    //Obtenemos la gasolinera mas cercana de nuestro camino
+                     for(FuelStation thisFs : fsList){
+                         double distance = this.getDistanceByLatLng(
+                                 lt.getLatitude(),
+                                 lt.getLongitude(),
+                                 thisFs.getLatLng().getLatitude(),
+                                 thisFs.getLatLng().getLongitude()
+                         );
+
+                         if(distance <= minDistance){
+                             minDistance = distance;
+                             minFuelStationDistance = thisFs;
+                         }
+                     }
+                }
+            }
+
+
+            List<Route> listRoute = new ArrayList<>();
+            //Ahora hacemos 2 rutas directas: una del origen a la gasolinera y otra de la gasolinera al destino
+            if(minFuelStationDistance!=null){
+                ResponseEntity<Route> routeSrcToFuelStation = this.getRouteByLatLng(
+                        latSrc,
+                        lngSrc,
+                        minFuelStationDistance.getLatLng().getLatitude(),
+                        minFuelStationDistance.getLatLng().getLongitude()
+                );
+
+                ResponseEntity<Route> routeFuelStationToDst = this.getRouteByLatLng(
+                        minFuelStationDistance.getLatLng().getLatitude(),
+                        minFuelStationDistance.getLatLng().getLongitude(),
+                        latDst,
+                        lngDst
+                );
+                listRoute.add(routeSrcToFuelStation.getBody());
+                listRoute.add(routeFuelStationToDst.getBody());
+
+            } else {
+                listRoute.add(originalRoute);
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(listRoute);
+
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+
+
 
 
 
