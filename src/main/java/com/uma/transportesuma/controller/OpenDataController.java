@@ -82,18 +82,19 @@ public class OpenDataController {
     /**
      * Devuelve una lista de lugares (vease la clase Place) dados una latitud, longitud y un nombre.
      * Hace uso de la API de HERE
-     * Ejemplo de consulta: .../api/opendata/discover/01.23,04.56/facultad
      *
-     * @param latAndLng Latitud y longitud separadas por una coma. Ejemplo: 01.23,04.56
+     * Ejemplo de consulta: .../api/opendata/get/places/01.23/04.56/facultad
+     *
+     * @param lat Latitud
+     * @param lng Longitud
      * @param name Nombre completo o parcial de un lugar. Ejemplos: "Facul", "Facultad"...
      */
-    @GetMapping("/discover/{latlng}/{name}")
-    public ResponseEntity<List<Place>> getPlacesByLatLngAndName(@PathVariable("latlng") String latAndLng,
+    @GetMapping("/get/places/{lat}/{lng}/{name}")
+    public ResponseEntity<List<Place>> getPlacesByLatLngAndName(@PathVariable("lat") Double lat,
+                                                                @PathVariable("lng") Double lng,
                                                                 @PathVariable("name") String name){
 
         try {
-            Double lat = Double.parseDouble(latAndLng.split(",")[0]);
-            Double lng = Double.parseDouble(latAndLng.split(",")[1]);
 
             String urlApiHere = this.getUrlHereApiDiscover(lat, lng, "ESP", name, 10);
             ResponseEntity<JsonNode> jsonResponse = restTemplate.exchange(urlApiHere, HttpMethod.GET, null, JsonNode.class);
@@ -136,7 +137,7 @@ public class OpenDataController {
      * @param lngDst longitud destino
      * @return Devuelve un objeto de clase Route. Poseera la lista de puntos (points) por
      */
-    @GetMapping("/route/{latSrc}/{lngSrc}/{latDst}/{lngDst}")
+    @GetMapping("/get/route/{latSrc}/{lngSrc}/{latDst}/{lngDst}")
     public ResponseEntity<Route> getRouteByLatLng(
             @PathVariable("latSrc") Double latSrc,
             @PathVariable("lngSrc") Double lngSrc,
@@ -197,7 +198,7 @@ public class OpenDataController {
      *
      * @return Devuelve una lista de gasolineras. Vease FuelStation.
      */
-    @GetMapping("/fuelstation")
+    @GetMapping("/get/fuelstation/")
     private ResponseEntity<List<FuelStation>> getFuelStationsEsp(){
         try {
             return ResponseEntity.status(HttpStatus.OK).body(this.getFuelStationList());
@@ -244,7 +245,7 @@ public class OpenDataController {
      * @return Devuelve una lista de gasolineras. Vease FuelStation.
      */
 
-    @GetMapping("/fuelstation/lat/lng/radius/{lat}/{lng}/{radius}")
+    @GetMapping("/get/fuelstation/lat/lng/radius/{lat}/{lng}/{radius}")
     private ResponseEntity<List<FuelStation>> getFuelStationsEspByLatLngAndRadius(
             @PathVariable("lat") Double lat,
             @PathVariable("lng") Double lng,
@@ -269,9 +270,9 @@ public class OpenDataController {
 
 
 
-
+    //Se puede realizar con una API externa, sin embargo, es mejor así ya que mejora los tiempos
     private double getDistanceByLatLng(double lat1, double lng1, double lat2, double lng2) {
-        double radioTierra = 6371;//en kilómetros
+        double radioTierra = 6371;//en kilometros
         double dLat = Math.toRadians(lat2 - lat1);
         double dLng = Math.toRadians(lng2 - lng1);
         double sindLat = Math.sin(dLat / 2);
