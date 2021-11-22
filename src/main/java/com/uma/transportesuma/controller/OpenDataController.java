@@ -30,6 +30,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/opendata")
@@ -51,11 +52,31 @@ public class OpenDataController {
                 .version(HttpClient.Version.HTTP_2)
                 .build();
 
+    private JsonObject getJsonObjectByUrl(String url) throws Exception{
+
+        /*HttpClient httpClient = HttpClient.newBuilder()
+                .sslContext(SSLContext.getDefault())
+                .sslParameters(new SSLParameters())
+                .version(HttpClient.Version.HTTP_2)
+                .build();*/
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(url))
+                .setHeader("Accept", "application/json")
+                .build();
+
+        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return JsonParser.parseString(response.body()).getAsJsonObject();
+    }
+
 
 
     @Autowired
     @Qualifier("restTemplate")
     private RestTemplate restTemplate;
+
 
 
     /**
@@ -105,6 +126,7 @@ public class OpenDataController {
     }
 
 
+
     /**
      * Devuelve una ruta (vease la clase Route) con el camino mas corto y mas rapido entre un origen
      * y un destino. Hace uso de la API de TomTom
@@ -126,7 +148,7 @@ public class OpenDataController {
             JsonObject jsonObjectReponse = this.getJsonObjectByUrl(this.getUrlTomTomApiRouting(latSrc, lngSrc, latDst, lngDst));
 
             Gson gson = new Gson();
-
+            double vv = this.getDistanceByLatLng(36.714608, -4.264197, 36.713706, -4.266476);
 
             JsonObject jsonSummaryAndPoints = jsonObjectReponse
                     .get("routes").getAsJsonArray()
@@ -150,7 +172,6 @@ public class OpenDataController {
 
     }
 
-
     private String getUrlTomTomApiRouting(Double latSrc, Double lngSrc, Double latDst, Double lngDst){
         return this.TOMTOM_PREFFIX_API_ROUTING + latSrc + "," + lngSrc + ":" + latDst + "," + lngDst +
                 "/json?" +
@@ -169,65 +190,97 @@ public class OpenDataController {
     }
 
 
+
     /**
      * Devuelve los precios que posee cada gasolinera en españa.
      * Nota: La llamada a este url es algo tena debido a la gran cantidad de datos.
      *
-     * @return Devuelve una lista de gasolineras. Vease FuelStation
+     * @return Devuelve una lista de gasolineras. Vease FuelStation.
      */
     @GetMapping("/fuelstation")
     private ResponseEntity<List<FuelStation>> getFuelStationsEsp(){
         try {
-            Gson gson = new Gson();
-            JsonObject jsonObjectResponse = this.getJsonObjectByUrl(this.GOB_ESP_API_URL_FUEL_PRICE);
-
-            JsonArray jsonFuelStationList = jsonObjectResponse.get("ListaEESSPrecio").getAsJsonArray();
-
-            List<FuelStation> fuelStationList = new ArrayList<>();
-
-            jsonFuelStationList.forEach(elem -> {
-                FuelStation fs = gson.fromJson(elem.getAsJsonObject(), FuelStation.class);
-                Double lat, lng;
-                try {
-                    String slat = elem.getAsJsonObject().get("Latitud").getAsString().replace(",", ".");
-                    String slng = elem.getAsJsonObject().get("Longitud (WGS84)").getAsString().replace(",", ".");
-                    lat = Double.parseDouble(slat);
-                    lng = Double.parseDouble(slng);
-                } catch (NumberFormatException ex){
-                    lat = null;
-                    lng = null;
-                }
-                fs.setLatLng(new LatLng(lat, lng));
-                fuelStationList.add(fs);
-            });
-
-
-            return ResponseEntity.status(HttpStatus.OK).body(fuelStationList);
+            return ResponseEntity.status(HttpStatus.OK).body(this.getFuelStationList());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
+    private List<FuelStation> getFuelStationList() throws Exception{
+        Gson gson = new Gson();
+        JsonObject jsonObjectResponse = this.getJsonObjectByUrl(this.GOB_ESP_API_URL_FUEL_PRICE);
 
-    private JsonObject getJsonObjectByUrl(String url) throws Exception{
+        JsonArray jsonFuelStationList = jsonObjectResponse.get("ListaEESSPrecio").getAsJsonArray();
 
-        /*HttpClient httpClient = HttpClient.newBuilder()
-                .sslContext(SSLContext.getDefault())
-                .sslParameters(new SSLParameters())
-                .version(HttpClient.Version.HTTP_2)
-                .build();*/
+        List<FuelStation> fuelStationList = new ArrayList<>();
 
-        HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(URI.create(url))
-                .setHeader("Accept", "application/json")
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-        return JsonParser.parseString(response.body()).getAsJsonObject();
+        jsonFuelStationList.forEach(elem -> {
+            FuelStation fs = gson.fromJson(elem.getAsJsonObject(), FuelStation.class);
+            Double lat, lng;
+            try {
+                String slat = elem.getAsJsonObject().get("Latitud").getAsString().replace(",", ".");
+                String slng = elem.getAsJsonObject().get("Longitud (WGS84)").getAsString().replace(",", ".");
+                lat = Double.parseDouble(slat);
+                lng = Double.parseDouble(slng);
+            } catch (NumberFormatException ex){
+                lat = null;
+                lng = null;
+            }
+            fs.setLatLng(new LatLng(lat, lng));
+            fuelStationList.add(fs);
+        });
+        return fuelStationList;
     }
 
+
+    /**
+     * Devuelve los precios que posee cada casolinera que se encuentren dentro de un rango (en metros)
+     * y su centro en latitud y longitud.
+     * Nota: Es util si queremos obtener las gasolineras mas cercanas dado una posicion GPS.
+     *
+     * @param lat Latitud del usuario
+     * @param lng Longitud del usuario
+     * @param radius Radio en METROS
+     * @return Devuelve una lista de gasolineras. Vease FuelStation.
+     */
+
+    @GetMapping("/fuelstation/lat/lng/radius/{lat}/{lng}/{radius}")
+    private ResponseEntity<List<FuelStation>> getFuelStationsEspByLatLngAndRadius(
+            @PathVariable("lat") Double lat,
+            @PathVariable("lng") Double lng,
+            @PathVariable("radius") Integer radius){
+
+        try {
+            List<FuelStation> fuelStationList = this.getFuelStationList();
+            List<FuelStation> fuelStationListInsideRadius = fuelStationList
+                    .stream()
+                    .filter(elem -> (this.getDistanceByLatLng(elem.getLatLng().getLatitude(),elem.getLatLng().getLongitude(),lat,lng) <= radius.doubleValue()))
+                    .collect(Collectors.toList());
+
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fuelStationListInsideRadius);
+
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+    }
+
+
+
+
+
+    private double getDistanceByLatLng(double lat1, double lng1, double lat2, double lng2) {
+        double radioTierra = 6371;//en kilómetros
+        double dLat = Math.toRadians(lat2 - lat1);
+        double dLng = Math.toRadians(lng2 - lng1);
+        double sindLat = Math.sin(dLat / 2);
+        double sindLng = Math.sin(dLng / 2);
+        double va1 = Math.pow(sindLat, 2) + Math.pow(sindLng, 2)
+                * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
+        double va2 = 2 * Math.atan2(Math.sqrt(va1), Math.sqrt(1 - va1));
+        return radioTierra * va2 * 1000;
+    }
 
 
 }
