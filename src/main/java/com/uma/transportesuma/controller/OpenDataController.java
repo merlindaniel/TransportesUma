@@ -26,6 +26,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,7 @@ public class OpenDataController {
 
     //API G
     private final String GOB_ESP_API_URL_FUEL_PRICE = "https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/";
+    private final int GOB_ESP_UPDATE_TIME_MINUTES_API = 1;
 
     //HTTP Client Java 11
     private HttpClient httpClient = HttpClient.newBuilder()
@@ -201,8 +203,18 @@ public class OpenDataController {
         }
     }
 
-
+    private List<FuelStation> fuelStationListLastCharged;
+    private long lastUpdateSeconds;
     private List<FuelStation> getFuelStationList(Double latitude, Double longitude, Integer radius) throws Exception {
+
+        //Evita la sobrecarga de la api del gobierno. Solo se realizara un fetch cada X minutos. Vease constante GOB_ESP_UPDATE_TIME_MINUTES_API.
+        long currentMillis = new Date().getTime();
+        if(this.fuelStationListLastCharged != null && (lastUpdateSeconds + (1000 * 60 * GOB_ESP_UPDATE_TIME_MINUTES_API)) >= currentMillis)
+            return fuelStationListLastCharged;
+
+
+
+
         Gson gson = new Gson();
         JsonObject jsonObjectResponse = this.getJsonObjectByUrl(this.GOB_ESP_API_URL_FUEL_PRICE);
 
@@ -226,21 +238,26 @@ public class OpenDataController {
             fuelStationList.add(fs);
         });
 
+        this.lastUpdateSeconds = currentMillis;
         if(latitude==null || longitude == null || radius == null){
+            this.fuelStationListLastCharged = fuelStationList;
             return fuelStationList;
         } else {
-            return fuelStationList
-                    .stream()
-                    .filter(elem -> (
-                                this.getDistanceByLatLng(
-                                    elem.getLatLng().getLatitude(),
-                                    elem.getLatLng().getLongitude(),
-                                    latitude,
-                                    longitude
-                                ) <= radius.doubleValue()
-                            )
-                    )
-                    .collect(Collectors.toList());
+            List<FuelStation> result = fuelStationList
+                                        .stream()
+                                        .filter(elem -> (
+                                                    this.getDistanceByLatLng(
+                                                        elem.getLatLng().getLatitude(),
+                                                        elem.getLatLng().getLongitude(),
+                                                        latitude,
+                                                        longitude
+                                                    ) <= radius.doubleValue()
+                                                )
+                                        )
+                                        .collect(Collectors.toList());
+
+            this.fuelStationListLastCharged = result;
+            return result;
         }
 
     }
