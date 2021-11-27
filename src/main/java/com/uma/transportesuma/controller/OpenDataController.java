@@ -44,7 +44,7 @@ public class OpenDataController {
 
     //API DEL GOBIERNO
     private final String GOB_ESP_API_URL_FUEL_PRICE = "https://sedeaplicaciones.minetur.gob.es/ServiciosRESTCarburantes/PreciosCarburantes/EstacionesTerrestres/";
-    private final int GOB_ESP_UPDATE_TIME_MINUTES_API = 1;
+    private final int GOB_ESP_UPDATE_TIME_MINUTES_API = 20;
 
     //HTTP Client Java 11
     private HttpClient httpClient = HttpClient.newBuilder()
@@ -72,12 +72,6 @@ public class OpenDataController {
 
 
 
-    @Autowired
-    @Qualifier("restTemplate")
-    private RestTemplate restTemplate;
-
-
-
     /**
      * Devuelve una lista de lugares (vease la clase Place) dados una latitud, longitud y un nombre.
      * Hace uso de la API de HERE
@@ -95,23 +89,23 @@ public class OpenDataController {
 
         try {
 
-            String urlApiHere = this.getUrlHereApiDiscover(lat, lng, "ESP", name, 10);
-            ResponseEntity<JsonNode> jsonResponse = restTemplate.exchange(urlApiHere, HttpMethod.GET, null, JsonNode.class);
-            JsonNode map = jsonResponse.getBody().get("items");
+            String urlApiHere = this.getUrlHereApiDiscover(lat, lng, "ESP", name, 20);
 
-            JsonNode arrNode = new ObjectMapper().readTree(String.valueOf(map));
+            JsonObject response =  this.getJsonObjectByUrl(urlApiHere);
+            JsonArray listaLugares = response.get("items").getAsJsonArray();
+
             List<Place> places = new ArrayList<>();
-            if(arrNode.isArray()){
-                for(JsonNode obj : arrNode){
-                    Place l = new Place();
-                    l.setTitle(obj.get("title").asText());
-                    l.setAddress(obj.get("address").get("label").asText());
-                    l.setLat(obj.get("position").get("lat").asDouble());
-                    l.setLng(obj.get("position").get("lng").asDouble());
-                    l.setDistance(obj.get("distance").asInt());
-                    places.add(l);
-                }
+            for(JsonElement elem : listaLugares){
+                JsonObject obj = elem.getAsJsonObject();
+                Place l = new Place();
+                l.setTitle(obj.get("title").getAsString());
+                l.setAddress(obj.get("address").getAsJsonObject().get("label").getAsString());
+                l.setLat(obj.get("position").getAsJsonObject().get("lat").getAsDouble());
+                l.setLng(obj.get("position").getAsJsonObject().get("lng").getAsDouble());
+                l.setDistance(obj.get("distance").getAsInt());
+                places.add(l);
             }
+
 
             return ResponseEntity.status(HttpStatus.OK).body(places);
 
@@ -373,8 +367,6 @@ public class OpenDataController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
-
-
 
 
 
