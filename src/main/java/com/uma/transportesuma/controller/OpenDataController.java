@@ -278,7 +278,7 @@ public class OpenDataController {
         try {
             List<FuelStation> fuelStationList = this.getFuelStationList(lat, lng, radius);
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(fuelStationList);
+            return ResponseEntity.status(HttpStatus.OK).body(fuelStationList);
 
         } catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
