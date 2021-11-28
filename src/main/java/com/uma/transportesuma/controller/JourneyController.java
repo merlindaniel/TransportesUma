@@ -98,11 +98,11 @@ public class JourneyController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Journey> updateJourney(@PathVariable final String id) {
+    public ResponseEntity<Journey> updateJourney(@PathVariable final String id, @RequestBody final Journey journey){
         try {
-            Journey journey = journeyService.findJourneyById(id).get();
+            Journey journeyUpdated = journeyService.updateJourney(id, journey);
 
-            return new ResponseEntity<>(journeyService.updateJourney(journey), HttpStatus.OK);
+            return new ResponseEntity<>(journeyUpdated, HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
