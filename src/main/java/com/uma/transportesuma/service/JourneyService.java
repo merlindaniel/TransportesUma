@@ -103,14 +103,17 @@ public class JourneyService {
     }
 
     public Journey addParticipant(Journey journey, User participant) {
-        assert journey.getParticipants().size() + 1 < journey.getVehicle().getSeats();
-        journey.addParticipant(participant);
+        if(journey.getParticipants().size() + 1 < journey.getVehicle().getSeats()){
+            journey.addParticipant(participant);
 
-        Journey result = updateJourney(journey);
+            Journey result = updateJourney(journey);
 
-        participant.addParticipatedJourney(result);
-        userService.updateUser(participant);
-        return result;
+            participant.addParticipatedJourney(result);
+            userService.updateUser(participant);
+            return result;
+        }
+        return null;
+
     }
 
     public Journey removeParticipant(Journey journey, User participant) {

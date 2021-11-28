@@ -136,13 +136,17 @@ public class JourneyController {
     }
 
     // Where "ParticipantId" is the user's id/name/email
-    @PostMapping("/participants/{journeyId}/{participantId}")
+    @GetMapping("/participants/{journeyId}/{participantId}")
     public ResponseEntity<Journey> addParticipant(@PathVariable final String journeyId, @PathVariable final String participantId) {
         try {
             Journey journey = journeyService.findJourneyById(journeyId).get();
             User user = userService.findUser(participantId).get();
 
-            return new ResponseEntity<>(journeyService.addParticipant(journey, user), HttpStatus.OK);
+            Journey result = journeyService.addParticipant(journey, user);
+            if(result != null)
+                return new ResponseEntity<>(result, HttpStatus.OK);
+            else
+                return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
