@@ -7,9 +7,10 @@ import lombok.*;
 @Setter
 @Getter
 @ToString
-public class Place {
+public class PlaceByOrigin {
     private String title;
     private Double lat;
     private Double lng;
+    private Integer distance;
     private String address;
 }

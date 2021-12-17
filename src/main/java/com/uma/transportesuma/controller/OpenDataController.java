@@ -1,26 +1,18 @@
 package com.uma.transportesuma.controller;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.*;
 import com.uma.transportesuma.dto.FuelStation;
-import com.uma.transportesuma.dto.Place;
+import com.uma.transportesuma.dto.PlaceByOrigin;
 import com.uma.transportesuma.dto.Route;
 import com.uma.transportesuma.vo.LatLng;
 import com.uma.transportesuma.vo.RouteSummary;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLParameters;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -83,9 +75,9 @@ public class OpenDataController {
      * @param name Nombre completo o parcial de un lugar. Ejemplos: "Facul", "Facultad"...
      */
     @GetMapping("/get/places/{lat}/{lng}/{name}")
-    public ResponseEntity<List<Place>> getPlacesByLatLngAndName(@PathVariable("lat") Double lat,
-                                                                @PathVariable("lng") Double lng,
-                                                                @PathVariable("name") String name){
+    public ResponseEntity<List<PlaceByOrigin>> getPlacesByLatLngAndName(@PathVariable("lat") Double lat,
+                                                                        @PathVariable("lng") Double lng,
+                                                                        @PathVariable("name") String name){
 
         try {
 
@@ -94,10 +86,10 @@ public class OpenDataController {
             JsonObject response =  this.getJsonObjectByUrl(urlApiHere);
             JsonArray listaLugares = response.get("items").getAsJsonArray();
 
-            List<Place> places = new ArrayList<>();
+            List<PlaceByOrigin> places = new ArrayList<>();
             for(JsonElement elem : listaLugares){
                 JsonObject obj = elem.getAsJsonObject();
-                Place l = new Place();
+                PlaceByOrigin l = new PlaceByOrigin();
                 l.setTitle(obj.get("title").getAsString());
                 l.setAddress(obj.get("address").getAsJsonObject().get("label").getAsString());
                 l.setLat(obj.get("position").getAsJsonObject().get("lat").getAsDouble());

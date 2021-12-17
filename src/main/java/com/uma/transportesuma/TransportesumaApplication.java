@@ -39,7 +39,7 @@ public class TransportesumaApplication {
 				userService.removeAllUsers();
 
 			if (false) {
-				User user = new User("zodd", "zodd@gmail.com", "123");
+				User user = new User("zodd", "Jose" , "zodd@gmail.com", "123");
 				userService.addUser(user);
 			}
 
@@ -52,7 +52,7 @@ public class TransportesumaApplication {
 						ResponseEntity<JsonNode> randomUser = restTemplate.exchange("https://randomuser.me/api/", HttpMethod.GET, entity, JsonNode.class);
 						JsonNode map = randomUser.getBody().get("results").get(0);
 
-						User user = new User(map.get("login").get("username").asText(), map.get("email").asText(), map.get("login").get("password").asText());
+						User user = new User(map.get("login").get("username").asText(), map.get("name").asText(), map.get("email").asText(), map.get("login").get("password").asText());
 
 						userService.addUser(user);
 					}

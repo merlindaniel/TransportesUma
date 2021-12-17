@@ -2,6 +2,7 @@ package com.uma.transportesuma.document;
 
 import com.mongodb.lang.NonNull;
 import com.uma.transportesuma.dto.Place;
+import com.uma.transportesuma.dto.PlaceByOrigin;
 import com.uma.transportesuma.document.vehicle.Vehicle;
 import lombok.*;
 import org.springframework.data.annotation.Id;
@@ -36,10 +37,12 @@ public class Journey implements Serializable {
     @NonNull
     private Place destination;
 
-
     @NonNull
     // Organizer id (User)
     private String organizer;
+
+    @NonNull
+    private int numberParticipants;
 
     @NonNull
     // Travellers id (User)
@@ -55,20 +58,25 @@ public class Journey implements Serializable {
     private Date startDate;
 
     @NonNull
+    private boolean exam;
+
+    @NonNull
     private boolean finished;
 
-    public Journey(@NonNull String name, @NonNull String description, @NonNull Place origin, @NonNull Place destination, @NonNull Vehicle vehicle, double price, Date startDate, boolean finished) {
-        this(name, description, origin, destination, null, new HashSet<>(), vehicle, price, startDate, finished);
+    public Journey(@NonNull String name, @NonNull String description, @NonNull Place origin, @NonNull Place destination, @NonNull int numberParticipants, @NonNull Vehicle vehicle, double price, Date startDate, boolean exam, boolean finished) {
+        this(name, description, origin, destination, null, new HashSet<>(), numberParticipants, vehicle, price, startDate, exam, finished);
     }
 
-    public Journey(@NonNull String name, @NonNull String description, @NonNull Place origin, @NonNull Place destination, @NonNull String organizer, @NonNull Set<String> participants, @NonNull Vehicle vehicle, double price, Date startDate, boolean finished) {
+    public Journey(@NonNull String name, @NonNull String description, @NonNull Place origin, @NonNull Place destination, @NonNull String organizer, @NonNull Set<String> participants, @NonNull int numberParticipants, @NonNull Vehicle vehicle, double price, Date startDate, boolean exam, boolean finished) {
         this.origin = origin;
         this.destination = destination;
         this.organizer = organizer;
         this.participants = participants;
+        this.numberParticipants = numberParticipants;
         this.vehicle = vehicle;
         this.price = price;
         this.startDate = startDate;
+        this.exam = exam;
         this.finished = finished;
     }
 

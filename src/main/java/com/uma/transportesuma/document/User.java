@@ -33,6 +33,9 @@ public class User implements Serializable {
     private String email;
 
     @NonNull
+    private String name;
+
+    @NonNull
     private String password;
 
     @NonNull
@@ -44,8 +47,9 @@ public class User implements Serializable {
     @NonNull
     private Set<String> vehicles;
 
-    public User(@NonNull String username, @NonNull String email, @NonNull String password) {
+    public User(@NonNull String username, @NonNull String name, @NonNull String email, @NonNull String password) {
         this.username = username;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.organizedJourneys = new HashSet<>();
