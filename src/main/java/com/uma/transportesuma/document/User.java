@@ -38,46 +38,10 @@ public class User implements Serializable {
     @NonNull
     private String password;
 
-    @NonNull
-    private Set<String> organizedJourneys;
-
-    @NonNull
-    private Set<String> participatedJourneys;
-
-    @NonNull
-    private Set<String> vehicles;
-
     public User(@NonNull String username, @NonNull String name, @NonNull String email, @NonNull String password) {
         this.username = username;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.organizedJourneys = new HashSet<>();
-        this.participatedJourneys = new HashSet<>();
-        this.vehicles = new HashSet<>();
-    }
-
-    public void addOrganizedJourney(Journey journey) {
-        organizedJourneys.add(journey.getId());
-    }
-
-    public void removeOrganizedJourney(Journey journey) {
-        organizedJourneys.remove(journey.getId());
-    }
-
-    public void addParticipatedJourney(Journey journey) {
-        participatedJourneys.add(journey.getId());
-    }
-
-    public void removeParticipatedJourney(Journey journey) {
-        participatedJourneys.remove(journey.getId());
-    }
-
-    public void addVehicle(Vehicle vehicle) {
-        vehicles.add(vehicle.getId());
-    }
-
-    public void removeVehicle(Vehicle vehicle) {
-        vehicles.remove(vehicle.getId());
     }
 }

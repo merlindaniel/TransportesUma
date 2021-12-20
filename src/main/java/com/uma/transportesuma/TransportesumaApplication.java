@@ -19,47 +19,52 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 public class TransportesumaApplication {
 
-	@Bean
-	public RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
 
-	@Autowired
-	@Qualifier("restTemplate")
-	private RestTemplate restTemplate;
+    @Autowired
+    @Qualifier("restTemplate")
+    private RestTemplate restTemplate;
 
-	public static void main(String[] args) {
-		SpringApplication.run(TransportesumaApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TransportesumaApplication.class, args);
+    }
 
-	@Bean
-	CommandLineRunner runner(@Autowired UserService userService) {
-		return args -> {
-			if (false)
-				userService.removeAllUsers();
+    @Bean
+    CommandLineRunner runner(@Autowired UserService userService) {
+        return args -> {
+            if (false)
+                userService.removeAllUsers();
 
-			if (false) {
-				User user = new User("zodd", "Jose" , "zodd@gmail.com", "123");
-				userService.addUser(user);
-			}
+            if (false) {
+                User user = new User("zodd", "Jose", "zodd@gmail.com", "123");
+                userService.addUser(user);
+            }
 
-			// Insert random users (https://randomuser.me/api/)
-			if (false) {
-				try {
-					int N_USERS = 20;
-					for (int i = 0; i < N_USERS; i++) {
-						HttpEntity<JsonNode> entity = null;
-						ResponseEntity<JsonNode> randomUser = restTemplate.exchange("https://randomuser.me/api/", HttpMethod.GET, entity, JsonNode.class);
-						JsonNode map = randomUser.getBody().get("results").get(0);
+            // Insert random users (https://randomuser.me/api/)
+            if (false) {
+                try {
+                    int N_USERS = 8;
+                    for (int i = 0; i < N_USERS; i++) {
+                        HttpEntity<JsonNode> entity = null;
+                        ResponseEntity<JsonNode> randomUser = restTemplate.exchange("https://randomuser.me/api/", HttpMethod.GET, entity, JsonNode.class);
+                        JsonNode map = randomUser.getBody().get("results").get(0);
 
-						User user = new User(map.get("login").get("username").asText(), map.get("name").asText(), map.get("email").asText(), map.get("login").get("password").asText());
+                        User user = new User(
+                                map.get("login").get("username").asText(),
+                                map.get("name").get("first").asText() + ' ' + map.get("name").get("last").asText(),
+                                map.get("email").asText(),
+                                map.get("login").get("password").asText()
+                        );
 
-						userService.addUser(user);
-					}
-				} catch (Exception ex) {
-					ex.printStackTrace();
-				}
-			}
-		};
-	}
+                        userService.addUser(user);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        };
+    }
 }

@@ -68,9 +68,6 @@ public class UserService {
             userInBD.setUsername(user.getUsername());
             userInBD.setEmail(user.getEmail());
             userInBD.setPassword(user.getPassword());
-            userInBD.setOrganizedJourneys(user.getOrganizedJourneys());
-            userInBD.setParticipatedJourneys(user.getParticipatedJourneys());
-            userInBD.setVehicles(user.getVehicles());
 
             return userRepository.save(userInBD);
         }

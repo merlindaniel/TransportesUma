@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/api/users/")
+@RequestMapping(path = "/api/users")
 @AllArgsConstructor
 //@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
@@ -20,7 +20,7 @@ public class UserController {
     @Autowired
     private final UserService userService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<User>> findAllUsers() {
         try {
             return new ResponseEntity<>(userService.findAllUsers(), HttpStatus.OK);
@@ -38,7 +38,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<User> addUser(@RequestBody final User user) {
         try {
             return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);

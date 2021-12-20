@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(path = "/api/journeys/")
+@RequestMapping(path = "/api/journeys")
 @AllArgsConstructor
 public class JourneyController {
 
@@ -28,7 +28,7 @@ public class JourneyController {
     @Autowired
     private final VehicleService vehicleService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<Journey>> findAllJourneys() {
         try {
             return new ResponseEntity<>(journeyService.findAllJourneys(), HttpStatus.OK);
@@ -88,7 +88,7 @@ public class JourneyController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<Journey> addJourney(@RequestBody Journey journey) {
         try {
             return new ResponseEntity<>(journeyService.addJourney(journey), HttpStatus.OK);

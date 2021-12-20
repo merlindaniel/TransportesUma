@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/vehicles/")
+@RequestMapping(path = "/api/vehicles")
 @AllArgsConstructor
 public class VehicleController {
 
@@ -28,7 +28,7 @@ public class VehicleController {
     @Autowired
     private final VehicleService vehicleService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<Vehicle>> findAllVehicles()  {
         try {
             return new ResponseEntity<>(vehicleService.findAllVehicles(), HttpStatus.OK);
@@ -57,7 +57,7 @@ public class VehicleController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<Vehicle> addVehicle(@RequestBody final Vehicle vehicle) {
         try {
             return new ResponseEntity<>(vehicleService.addVehicle(vehicle), HttpStatus.OK);

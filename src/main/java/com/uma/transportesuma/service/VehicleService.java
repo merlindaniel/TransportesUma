@@ -43,11 +43,7 @@ public class VehicleService {
         User owner = userService.findUserById(vehicle.getOwner()).orElse(null);
 
         if (owner != null) {
-            Vehicle result = vehicleRepository.save(vehicle);
-            owner.addVehicle(result);
-            userService.updateUser(owner);
-
-            return result;
+            return vehicleRepository.save(vehicle);
         }
 
         return null;
@@ -57,10 +53,7 @@ public class VehicleService {
         User owner = userService.findUserById(vehicle.getOwner()).orElse(null);
 
         if (owner != null) {
-            owner.removeVehicle(vehicle);
             vehicleRepository.delete(vehicle);
-
-            userService.updateUser(owner);
         }
     }
 
@@ -68,7 +61,6 @@ public class VehicleService {
         Vehicle vehicleInDB = findVehicleById(id).orElse(null);
 
         if (vehicleInDB != null) {
-            // TODO update every field
             vehicleInDB.setCombustible(vehicle.getCombustible());
             vehicleInDB.setModel(vehicle.getModel());
             vehicleInDB.setName(vehicle.getName());

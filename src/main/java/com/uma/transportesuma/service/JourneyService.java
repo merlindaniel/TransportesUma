@@ -32,11 +32,9 @@ public class JourneyService {
     }
 
     public List<Journey> findOrganizedJourneys(User user) {
-        return user
-                .getOrganizedJourneys()
+        return findAllJourneys()
                 .stream()
-                .map(j -> findJourneyById(j)
-                .get())
+                .filter(j -> j.getOrganizer().equals(user.getId()))
                 .collect(Collectors.toList());
     }
 
@@ -48,11 +46,9 @@ public class JourneyService {
     }
 
     public List<Journey> findParticipatedJourneys(User user) {
-        return user
-                .getParticipatedJourneys()
+        return findAllJourneys()
                 .stream()
-                .map(j -> findJourneyById(j)
-                        .get())
+                .filter(j -> j.getParticipants().contains(user.getId()))
                 .collect(Collectors.toList());
     }
 
@@ -68,11 +64,7 @@ public class JourneyService {
     public Journey addJourney(Journey journey) {
         User organizer = userService.findUserById(journey.getOrganizer()).orElse(null);
         if (organizer != null) {
-            Journey result = journeyRepository.save(journey);
-            organizer.addOrganizedJourney(result);
-            userService.updateUser(organizer);
-
-            return result;
+            return journeyRepository.save(journey);
         }
 
         return null;
@@ -91,6 +83,7 @@ public class JourneyService {
             journeyInBD.setParticipants(journey.getParticipants());
             journeyInBD.setStartDate(journey.getStartDate());
             journeyInBD.setFinished(journey.isFinished());
+            journeyInBD.setExam(journey.isExam());
 
             return journeyRepository.save(journeyInBD);
         }
@@ -105,12 +98,7 @@ public class JourneyService {
     public Journey addParticipant(Journey journey, User participant) {
         if(journey.getParticipants().size() + 1 < journey.getVehicle().getSeats()){
             journey.addParticipant(participant);
-
-            Journey result = updateJourney(journey);
-
-            participant.addParticipatedJourney(result);
-            userService.updateUser(participant);
-            return result;
+            return updateJourney(journey);
         }
         return null;
 
@@ -118,32 +106,28 @@ public class JourneyService {
 
     public Journey removeParticipant(Journey journey, User participant) {
         journey.removeParticipant(participant);
-        Journey result = updateJourney(journey);
 
-        participant.removeParticipatedJourney(result);
-        userService.updateUser(participant);
-
-        return result;
+        return updateJourney(journey);
     }
 
     public void removeJourney(Journey journey) {
         // Delete organizer relation
-        Optional<User> optOrganizer = userService.findUserById(journey.getOrganizer());
-        if (optOrganizer.isPresent()) {
-            optOrganizer.get().removeOrganizedJourney(journey);
-            userService.updateUser(optOrganizer.get());
-        }
+//        Optional<User> optOrganizer = userService.findUserById(journey.getOrganizer());
+//        if (optOrganizer.isPresent()) {
+//            optOrganizer.get().removeOrganizedJourney(journey);
+//            userService.updateUser(optOrganizer.get());
+//        }
 
         // Delete participant relations
-        for (String userId : journey.getParticipants()) {
-            Optional<User> optParticipant = userService.findUserById(userId);
-
-            if (optParticipant.isPresent()) {
-                User participant = optParticipant.get();
-                participant.removeParticipatedJourney(journey);
-                userService.updateUser(participant);
-            }
-        }
+//        for (String userId : journey.getParticipants()) {
+//            Optional<User> optParticipant = userService.findUserById(userId);
+//
+//            if (optParticipant.isPresent()) {
+//                User participant = optParticipant.get();
+//                participant.removeParticipatedJourney(journey);
+//                userService.updateUser(participant);
+//            }
+//        }
 
         // Finally deletes journey from database
         journeyRepository.delete(journey);
