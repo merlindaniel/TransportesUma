@@ -80,8 +80,8 @@ public class OpenDataController {
                                                                         @PathVariable("name") String name){
 
         try {
-
-            String urlApiHere = this.getUrlHereApiDiscover(lat, lng, "ESP", name, 20);
+            String nameFormatted = name.replaceAll("\\s", "%20");
+            String urlApiHere = this.getUrlHereApiDiscover(lat, lng, "ESP", nameFormatted, 20);
 
             JsonObject response =  this.getJsonObjectByUrl(urlApiHere);
             JsonArray listaLugares = response.get("items").getAsJsonArray();
