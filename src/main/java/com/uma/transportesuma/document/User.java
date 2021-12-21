@@ -38,10 +38,13 @@ public class User implements Serializable {
     @NonNull
     private String password;
 
+    private String picture;
+
     public User(@NonNull String username, @NonNull String name, @NonNull String email, @NonNull String password) {
         this.username = username;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.picture = "";
     }
 }

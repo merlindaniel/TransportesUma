@@ -62,12 +62,13 @@ public class UserService {
     }
 
     public User updateUser(String id, User user) {
-        Optional<User> optUserInBD = findUserById(user.getId());
+        Optional<User> optUserInBD = findUserById(id);
         if (optUserInBD.isPresent()) {
             User userInBD = optUserInBD.get();
             userInBD.setUsername(user.getUsername());
             userInBD.setEmail(user.getEmail());
             userInBD.setPassword(user.getPassword());
+            userInBD.setPicture(user.getPicture());
 
             return userRepository.save(userInBD);
         }
