@@ -65,6 +65,7 @@ public class UserService {
         Optional<User> optUserInBD = findUserById(id);
         if (optUserInBD.isPresent()) {
             User userInBD = optUserInBD.get();
+            userInBD.setName(user.getName());
             userInBD.setUsername(user.getUsername());
             userInBD.setEmail(user.getEmail());
             userInBD.setPassword(user.getPassword());

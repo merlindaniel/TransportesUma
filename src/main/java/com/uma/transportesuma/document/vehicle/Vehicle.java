@@ -38,6 +38,8 @@ public class Vehicle implements Serializable {
     @NonNull
     private int seats;
 
+    private String picture;
+
     public Vehicle(@NonNull String registration, @NonNull String owner, @NonNull String name, @NonNull String model, @NonNull Combustible combustible, @NonNull int seats) {
         this.registration = registration;
         this.owner = owner;
@@ -45,5 +47,6 @@ public class Vehicle implements Serializable {
         this.model = model;
         this.combustible = combustible;
         this.seats = seats;
+        this.picture = "";
     }
 }

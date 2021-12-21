@@ -66,6 +66,7 @@ public class VehicleService {
             vehicleInDB.setName(vehicle.getName());
             vehicleInDB.setRegistration(vehicle.getRegistration());
             vehicleInDB.setSeats(vehicle.getSeats());
+            vehicleInDB.setPicture(vehicle.getPicture());
 
             return vehicleRepository.save(vehicleInDB);
         }
