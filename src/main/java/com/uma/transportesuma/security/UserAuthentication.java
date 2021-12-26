@@ -3,6 +3,7 @@ package com.uma.transportesuma.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.uma.transportesuma.vo.JWTToken;
 import com.uma.transportesuma.vo.UserAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,7 +40,7 @@ public class UserAuthentication {
 
     //Logea y CREA un token JWT
     @PostMapping("/login")
-    public String authenticateUser(@RequestBody UserAuth user){
+    public JWTToken authenticateUser(@RequestBody UserAuth user){
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
         );
@@ -48,7 +49,7 @@ public class UserAuthentication {
 
         String tokenJwt = this.getTokenJWT(user.getUsername());
 
-        return tokenJwt;
+        return new JWTToken(tokenJwt);
     }
 
     private String getTokenJWT(String user){
