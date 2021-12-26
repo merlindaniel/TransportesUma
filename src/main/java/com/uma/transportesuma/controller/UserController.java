@@ -1,6 +1,7 @@
 package com.uma.transportesuma.controller;
 
 import com.uma.transportesuma.document.User;
+import com.uma.transportesuma.dto.UserDTO;
 import com.uma.transportesuma.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,9 +41,9 @@ public class UserController {
     }
 
     @PostMapping("")
-    public ResponseEntity<User> addUser(@RequestBody final User user) {
+    public ResponseEntity<User> addUser(@Valid @RequestBody final UserDTO userDto) {
         try {
-            return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
+            return new ResponseEntity<>(userService.addUser(userDto), HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

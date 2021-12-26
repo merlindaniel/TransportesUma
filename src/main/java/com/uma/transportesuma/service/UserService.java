@@ -1,6 +1,7 @@
 package com.uma.transportesuma.service;
 
 import com.uma.transportesuma.document.User;
+import com.uma.transportesuma.dto.UserDTO;
 import com.uma.transportesuma.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,9 +51,10 @@ public class UserService {
 
     // ---------- Operations ----------
 
-    public User addUser(User user) {
+    public User addUser(UserDTO userDto) {
         BCryptPasswordEncoder bcpe = new BCryptPasswordEncoder();
-        user.setPassword(bcpe.encode(user.getPassword()));
+        userDto.setPassword(bcpe.encode(userDto.getPassword()));
+        User user = User.getUserFromDto(userDto);
         return userRepository.save(user);
     }
 

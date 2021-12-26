@@ -35,7 +35,7 @@ public class TransportesumaApplication {
     @Bean
     CommandLineRunner runner(@Autowired UserService userService) {
         return args -> {
-            if (false)
+            /*if (false)
                 userService.removeAllUsers();
 
             if (false) {
@@ -64,7 +64,7 @@ public class TransportesumaApplication {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-            }
+            }*/
         };
     }
 }

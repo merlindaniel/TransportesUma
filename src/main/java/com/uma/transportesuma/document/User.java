@@ -1,16 +1,16 @@
 package com.uma.transportesuma.document;
 
+
 import com.mongodb.lang.NonNull;
-import com.uma.transportesuma.document.vehicle.Vehicle;
+import com.uma.transportesuma.dto.UserDTO;
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -46,5 +46,15 @@ public class User implements Serializable {
         this.email = email;
         this.password = password;
         this.picture = "";
+    }
+
+    @Transient
+    public static User getUserFromDto(UserDTO userDTO){
+        User user = new User(userDTO.getUsername(), userDTO.getName(), userDTO.getEmail(), userDTO.getPassword());
+        if(userDTO.getPicture() == null)
+            user.setPicture("");
+        else
+            user.setPicture(userDTO.getPicture());
+        return user;
     }
 }
