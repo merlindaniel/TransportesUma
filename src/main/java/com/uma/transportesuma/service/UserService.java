@@ -4,6 +4,7 @@ import com.uma.transportesuma.document.User;
 import com.uma.transportesuma.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
@@ -50,6 +51,8 @@ public class UserService {
     // ---------- Operations ----------
 
     public User addUser(User user) {
+        BCryptPasswordEncoder bcpe = new BCryptPasswordEncoder();
+        user.setPassword(bcpe.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
