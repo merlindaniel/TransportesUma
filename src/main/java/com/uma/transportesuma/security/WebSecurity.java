@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.http.HttpMethod.POST;
+
 @Configuration
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter{
@@ -44,6 +46,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                     .antMatchers("/authentication/user/**").permitAll()
+                    .antMatchers(POST, "/api/users/**").permitAll()
                     .anyRequest().authenticated();
         http.addFilterBefore(getJwtFilter(), UsernamePasswordAuthenticationFilter.class);
     }
