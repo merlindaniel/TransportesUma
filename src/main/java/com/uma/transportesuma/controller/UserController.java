@@ -71,4 +71,14 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping("/recovery/password")
+    public ResponseEntity<?> recoverPassword(@RequestBody String email){
+        try{
+            this.userService.recoverPasswordByEmail(email);
+            return null;
+        } catch (Exception ex){
+            return null;
+        }
+    }
 }
