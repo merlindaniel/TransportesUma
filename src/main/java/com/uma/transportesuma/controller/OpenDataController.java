@@ -2,6 +2,7 @@ package com.uma.transportesuma.controller;
 
 import com.google.gson.*;
 import com.uma.transportesuma.dto.FuelStation;
+import com.uma.transportesuma.dto.Place;
 import com.uma.transportesuma.dto.PlaceByOrigin;
 import com.uma.transportesuma.dto.Route;
 import com.uma.transportesuma.vo.LatLng;
@@ -81,7 +82,7 @@ public class OpenDataController {
 
         try {
             String nameFormatted = name.replaceAll("\\s", "%20");
-            String urlApiHere = this.getUrlHereApiDiscover(lat, lng, "ESP", nameFormatted, 20);
+            String urlApiHere = this.getUrlHereApiDiscoverListPlaces(lat, lng, "ESP", nameFormatted, 20);
 
             JsonObject response =  this.getJsonObjectByUrl(urlApiHere);
             JsonArray listaLugares = response.get("items").getAsJsonArray();
@@ -107,11 +108,9 @@ public class OpenDataController {
 
     }
 
-    private String getUrlHereApiDiscover(Double lat, Double lng, String countryPrefix, String name, int limit){
+    private String getUrlHereApiDiscoverListPlaces(Double lat, Double lng, String countryPrefix, String name, int limit){
         return this.HERE_PREFFIX_API_DISCOVER + "?at=" + lat + "," + lng + "&limit=" + limit + "&q=+" + name + "+&in=countryCode:" + countryPrefix + "&apiKey=" + this.HERE_API_KEY;
     }
-
-
 
     /**
      * Devuelve una ruta (vease la clase Route) con el camino mas corto y mas rapido entre un origen

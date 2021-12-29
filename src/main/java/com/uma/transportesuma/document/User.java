@@ -57,4 +57,9 @@ public class User implements Serializable {
             user.setPicture(userDTO.getPicture());
         return user;
     }
+
+    @NonNull
+    public String getId() {
+        return id;
+    }
 }

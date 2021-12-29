@@ -2,6 +2,7 @@ package com.uma.transportesuma.controller;
 
 import com.uma.transportesuma.document.Journey;
 import com.uma.transportesuma.document.User;
+import com.uma.transportesuma.document.vehicle.Vehicle;
 import com.uma.transportesuma.service.JourneyService;
 import com.uma.transportesuma.service.UserService;
 import com.uma.transportesuma.service.VehicleService;
@@ -9,9 +10,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -67,6 +71,28 @@ public class JourneyController {
         }
     }
 
+    @GetMapping("/user/participating")
+    public ResponseEntity<List<Journey>> findMyParticipatingJounerys(){
+
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String usuarioActual = userDetails.getUsername();
+
+            Optional<User> u = userService.findUserByUsername(usuarioActual);
+            User user = null;
+            if(u.isEmpty()){
+                throw new Exception("Error: Usuario no encontrado.");
+            } else {
+                user = u.get();
+            }
+
+            return this.findParticipatedJourneysByUser(user.getId(), false);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
     // Where "id" is the user's id/name/email
     @GetMapping("/organizing/{id}")
     public ResponseEntity<List<Journey>> findOrganizedJourneysByUser(@PathVariable final String id,
@@ -88,9 +114,44 @@ public class JourneyController {
         }
     }
 
+    @GetMapping("/user/organizing")
+    public ResponseEntity<List<Journey>> findMyOrganizingJounerys(){
+
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String usuarioActual = userDetails.getUsername();
+
+            Optional<User> u = userService.findUserByUsername(usuarioActual);
+            User user = null;
+            if(u.isEmpty()){
+                throw new Exception("Error: Usuario no encontrado.");
+            } else {
+                user = u.get();
+            }
+
+            return this.findParticipatedJourneysByUser(user.getId(), false);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+    }
+
     @PostMapping("")
     public ResponseEntity<Journey> addJourney(@RequestBody Journey journey) {
         try {
+
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String usuarioActual = userDetails.getUsername();
+
+            Optional<User> u = userService.findUserByUsername(usuarioActual);
+            User user = null;
+            if(u.isEmpty()){
+                throw new Exception("Error: Usuario no encontrado.");
+            } else {
+                user = u.get();
+            }
+
+            journey.setOrganizer(user.getId());
             return new ResponseEntity<>(journeyService.addJourney(journey), HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

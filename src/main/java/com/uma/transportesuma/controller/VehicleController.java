@@ -2,6 +2,7 @@ package com.uma.transportesuma.controller;
 
 import com.uma.transportesuma.document.User;
 import com.uma.transportesuma.document.vehicle.Vehicle;
+import com.uma.transportesuma.repository.UserRepository;
 import com.uma.transportesuma.repository.VehicleRepository;
 import com.uma.transportesuma.service.JourneyService;
 import com.uma.transportesuma.service.UserService;
@@ -10,9 +11,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/vehicles")
@@ -55,6 +59,28 @@ public class VehicleController {
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/user/myVehicles")
+    public ResponseEntity<List<Vehicle>> findMyVehicles(){
+
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String usuarioActual = userDetails.getUsername();
+
+            Optional<User> u = userService.findUserByUsername(usuarioActual);
+            User user = null;
+            if(u.isEmpty()){
+                throw new Exception("Error: Usuario no encontrado.");
+            } else {
+                user = u.get();
+            }
+
+            return this.findVehiclesByOwner(user.getId());
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     }
 
     @PostMapping("")
