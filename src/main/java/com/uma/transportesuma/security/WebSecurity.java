@@ -12,7 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
@@ -47,6 +47,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
                 .authorizeRequests()
                     .antMatchers("/authentication/user/**").permitAll()
                     .antMatchers(POST, "/api/users/**").permitAll()
+                    .antMatchers(POST, "/api/vehicles/**").permitAll()
 
                     .anyRequest().authenticated();
         http.addFilterBefore(getJwtFilter(), UsernamePasswordAuthenticationFilter.class);

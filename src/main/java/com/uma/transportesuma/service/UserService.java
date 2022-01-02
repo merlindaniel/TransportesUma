@@ -81,7 +81,12 @@ public class UserService {
             userInBD.setName(user.getName());
             userInBD.setUsername(user.getUsername());
             userInBD.setEmail(user.getEmail());
-            userInBD.setPassword(user.getPassword());
+
+            if (!userInBD.getPassword().equals(user.getPassword())) {
+                BCryptPasswordEncoder bcpe = new BCryptPasswordEncoder();
+                userInBD.setPassword(bcpe.encode(user.getPassword()));
+            }
+
             userInBD.setPicture(user.getPicture());
 
             return userRepository.save(userInBD);
