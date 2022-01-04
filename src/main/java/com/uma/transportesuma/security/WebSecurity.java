@@ -47,9 +47,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
                 .authorizeRequests()
                     .antMatchers("/authentication/user/**").permitAll()
                     .antMatchers(POST, "/api/users/**").permitAll()
+                    .antMatchers(PUT, "/api/users/**").permitAll()
                     .antMatchers(POST, "/api/vehicles/**").permitAll()
+                    .antMatchers(GET, "/api/vehicles/{id}").permitAll()
+                    .antMatchers(PUT, "/api/vehicles/**").permitAll()
 
-                    .anyRequest().authenticated();
+                .anyRequest().authenticated();
         http.addFilterBefore(getJwtFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
