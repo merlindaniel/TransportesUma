@@ -104,6 +104,47 @@ public class UserController {
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
 
+    @PutMapping("/current")
+    public ResponseEntity<User> editCurrentUser(@RequestBody final User user) {
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String usuarioActual = userDetails.getUsername();
+
+            Optional<User> u = userService.findUserByUsername(usuarioActual);
+            User userInBD = null;
+            if(u.isEmpty()){
+                throw new Exception("Error: Usuario no encontrado.");
+            } else {
+                userInBD = u.get();
+            }
+
+            return new ResponseEntity<>(userService.updateUser(userInBD.getId(), user), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping("/current")
+    public ResponseEntity<User> deleteCurrentUser() {
+        try {
+            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            String usuarioActual = userDetails.getUsername();
+
+            Optional<User> u = userService.findUserByUsername(usuarioActual);
+            User userInBD = null;
+            if(u.isEmpty()){
+                throw new Exception("Error: Usuario no encontrado.");
+            } else {
+                userInBD = u.get();
+            }
+
+            // Borrar usuario
+            userService.removeUser(userInBD);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 }
