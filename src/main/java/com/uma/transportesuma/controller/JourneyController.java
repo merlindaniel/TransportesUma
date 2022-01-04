@@ -129,7 +129,8 @@ public class JourneyController {
                 user = u.get();
             }
 
-            return this.findParticipatedJourneysByUser(user.getId(), false);
+            return this.findOrganizedJourneysByUser(user.getId(), false);
+
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
