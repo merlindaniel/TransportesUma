@@ -140,7 +140,7 @@ public class VehicleController {
         }
     }
 
-    @DeleteMapping("/current")
+    @DeleteMapping("/current/{id}")
     public ResponseEntity<Vehicle> deleteVehicleFromCurrentUser(@PathVariable final String id) {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -170,7 +170,7 @@ public class VehicleController {
         }
     }
 
-    @PutMapping("/current")
+    @PutMapping("/current/{id}")
     public ResponseEntity<Vehicle> updateVehicleFromCurrentUser(@PathVariable final String id, @RequestBody final Vehicle vehicle) {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
