@@ -86,7 +86,7 @@ public class JourneyController {
                 user = u.get();
             }
 
-            return this.findParticipatedJourneysByUser(user.getId(), false);
+            return this.findParticipatedJourneysByUser(user.getId(), null);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
@@ -129,7 +129,7 @@ public class JourneyController {
                 user = u.get();
             }
 
-            return this.findOrganizedJourneysByUser(user.getId(), false);
+            return this.findOrganizedJourneysByUser(user.getId(), null);
 
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -162,10 +162,13 @@ public class JourneyController {
     @PutMapping("/{id}")
     public ResponseEntity<Journey> updateJourney(@PathVariable final String id, @RequestBody final Journey journey){
         try {
+
             Journey journeyUpdated = journeyService.updateJourney(id, journey);
+            System.out.println("Journey was successfully updated. " + journey.toString());
 
             return new ResponseEntity<>(journeyUpdated, HttpStatus.OK);
         } catch (Exception ex) {
+            System.out.println("Journey not found: " + journey.toString());
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }

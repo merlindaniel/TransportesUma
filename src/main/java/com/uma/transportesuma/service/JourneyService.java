@@ -77,6 +77,8 @@ public class JourneyService {
             Journey journeyInBD = optJourneyInBD.get();
             journeyInBD.setName(journey.getName());
             journeyInBD.setDescription(journey.getDescription());
+            journeyInBD.setOrigin(journey.getOrigin());
+            journeyInBD.setDestination(journey.getDestination());
             journeyInBD.setPrice(journey.getPrice());
             journeyInBD.setVehicle(journey.getVehicle());
             journeyInBD.setOrganizer(journey.getOrganizer());
