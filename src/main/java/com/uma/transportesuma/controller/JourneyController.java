@@ -50,6 +50,55 @@ public class JourneyController {
         }
     }
 
+
+
+
+
+
+
+
+
+
+    @GetMapping("my/journey/{id}")
+    public ResponseEntity<Journey> findAllMyJourney(@PathVariable final String id) {
+        try {
+
+            List<Journey> listOrganizing = this.findMyOrganizingJounerys().getBody();
+            List<Journey> listParticipating = this.findMyParticipatingJounerys().getBody();
+            Journey returnedJourney = null;
+
+            for(Journey j : listOrganizing){
+                if(j.getId().equals(id)){
+                    returnedJourney = j;
+                    break;
+                }
+            }
+
+            if(returnedJourney==null){
+                for(Journey j : listParticipating){
+                    if(j.getId().equals(id)){
+                        returnedJourney = j;
+                        break;
+                    }
+                }
+            }
+
+            if(returnedJourney == null)
+                throw new Exception("Journey not found");
+
+
+            return new ResponseEntity<>(returnedJourney, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+
+
+
+
+
     // Where "id" is the user's id/name/email
     @GetMapping("/participating/{id}")
     public ResponseEntity<List<Journey>> findParticipatedJourneysByUser(@PathVariable final String id,
