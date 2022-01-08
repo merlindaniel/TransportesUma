@@ -229,4 +229,14 @@ public class JourneyController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
+    // Busca viajes por origen, destino, numero de participantes y Fecha (que estén activos)
+    @GetMapping("/search/{origin}/{destination}/{participants}/{date}")
+    public ResponseEntity<List<Journey>> searchJourney(@PathVariable final String origin, @PathVariable final String destination, @PathVariable final Integer participants, @PathVariable final String date){
+        try{
+            return new ResponseEntity<>(journeyService.searchJourney(origin, destination, participants, date), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }
