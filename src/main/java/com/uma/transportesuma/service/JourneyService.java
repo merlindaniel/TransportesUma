@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -133,5 +136,25 @@ public class JourneyService {
 
         // Finally deletes journey from database
         journeyRepository.delete(journey);
+    }
+
+
+    public List<Journey> searchJourney(String origin, String destination, Integer participants, String date) {
+        SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
+        List<Journey> js = findAllJourneys();
+        List<Journey> res = new ArrayList<>();
+        for(Journey j : js){
+            if(j.getOrigin().getAddress().compareToIgnoreCase(origin) == 0
+                    && j.getDestination().getAddress().compareToIgnoreCase(destination) == 0
+                    && !j.isFinished() && (j.getNumberParticipants() > participants)
+            ){
+                Date jdate = j.getStartDate();
+                String jdateS = sd.format(jdate);
+                if(jdateS.compareToIgnoreCase(date) == 0){
+                    res.add(j);
+                }
+            }
+        }
+        return res;
     }
 }
