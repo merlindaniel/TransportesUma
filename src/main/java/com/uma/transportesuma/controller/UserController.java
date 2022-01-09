@@ -3,6 +3,7 @@ package com.uma.transportesuma.controller;
 import com.uma.transportesuma.document.User;
 import com.uma.transportesuma.document.vehicle.Vehicle;
 import com.uma.transportesuma.dto.UserDTO;
+import com.uma.transportesuma.exception.UserError;
 import com.uma.transportesuma.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,9 @@ public class UserController {
         try {
             return new ResponseEntity<>(userService.addUser(userDto), HttpStatus.OK);
         } catch (Exception ex) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            UserError ue = new UserError();
+            ue.setError(ex.getMessage());
+            return new ResponseEntity<>(ue, HttpStatus.BAD_REQUEST);
         }
     }
 

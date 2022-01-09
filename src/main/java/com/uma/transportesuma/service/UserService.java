@@ -3,6 +3,7 @@ package com.uma.transportesuma.service;
 import com.sun.mail.util.MailSSLSocketFactory;
 import com.uma.transportesuma.document.User;
 import com.uma.transportesuma.dto.UserDTO;
+import com.uma.transportesuma.exception.UserError;
 import com.uma.transportesuma.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,18 @@ public class UserService {
 
     // ---------- Operations ----------
 
-    public User addUser(UserDTO userDto) {
+    public User addUser(UserDTO userDto) throws Exception{
+
+        Optional<User>userOpt = this.findUserByEmail(userDto.getEmail());
+        if(userOpt.isPresent())
+            throw new Exception(UserError.EMAIL_ERROR);
+
+        userOpt = this.findUserByUsername(userDto.getUsername());
+        if(userOpt.isPresent())
+            throw new Exception(UserError.USERNAME_ERROR);
+
+
+
         BCryptPasswordEncoder bcpe = new BCryptPasswordEncoder();
         userDto.setPassword(bcpe.encode(userDto.getPassword()));
         User user = User.getUserFromDto(userDto);
