@@ -278,11 +278,42 @@ public class JourneyController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    // Busca viajes por origen, destino, numero de participantes y Fecha (que estén activos)
+
+    // Busca viajes por origen, destino, numero de participantes y Fecha (que estén activos) sin usuario logueado
     @GetMapping("/search/{origin}/{destination}/{participants}/{date}")
     public ResponseEntity<List<Journey>> searchJourney(@PathVariable final String origin, @PathVariable final String destination, @PathVariable final Integer participants, @PathVariable final String date){
         try{
             return new ResponseEntity<>(journeyService.searchJourney(origin, destination, participants, date), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Busca viajes por origen, destino, numero de participantes y Fecha (que estén activos y el usuario no sea organizador o participante) con usuario logueado
+    @GetMapping("/search/{origin}/{destination}/{participants}/{date}/{user}")
+    public ResponseEntity<List<Journey>> searchJourneyWUSer(@PathVariable final String origin, @PathVariable final String destination, @PathVariable final Integer participants, @PathVariable final String date, @PathVariable final String user){
+        try{
+            return new ResponseEntity<>(journeyService.searchJourneyWUser(origin, destination, participants, date, user), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Busca todos los viajes activos con usuario logueado (que estén activos y el usuario no sea organizador o participante)
+    @GetMapping("/search/{user}")
+    public ResponseEntity<List<Journey>> searchAllJourneyWUSer(@PathVariable final String user){
+        try{
+            return new ResponseEntity<>(journeyService.searchAllJourneyWUser(user), HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // Busca todos los viajes activos
+    @GetMapping("/search/")
+    public ResponseEntity<List<Journey>> searchAllJourney(){
+        try{
+            return new ResponseEntity<>(journeyService.searchAllJourney(), HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }

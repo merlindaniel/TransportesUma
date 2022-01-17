@@ -138,7 +138,6 @@ public class JourneyService {
         journeyRepository.delete(journey);
     }
 
-
     public List<Journey> searchJourney(String origin, String destination, Integer participants, String date) {
         SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
         List<Journey> js = findAllJourneys();
@@ -154,7 +153,56 @@ public class JourneyService {
                     res.add(j);
                 }
             }
+
         }
+        return res;
+    }
+
+    public List<Journey> searchJourneyWUser(String origin, String destination, Integer participants, String date, String user) {
+        SimpleDateFormat sd = new SimpleDateFormat("yyyy-MM-dd");
+        List<Journey> js = findAllJourneys();
+        List<Journey> res = new ArrayList<>();
+        for(Journey j : js){
+            if(j.getOrigin().getAddress().compareToIgnoreCase(origin) == 0
+                    && j.getDestination().getAddress().compareToIgnoreCase(destination) == 0
+                    && !j.isFinished() && (j.getNumberParticipants() > participants)
+            ){
+                Date jdate = j.getStartDate();
+                String jdateS = sd.format(jdate);
+                if(jdateS.compareToIgnoreCase(date) == 0){
+                        if(j.getOrganizer().compareToIgnoreCase(user) != 0){
+                            if(!j.getParticipants().contains(user)) {
+                                res.add(j);
+                            }
+                        }
+                }
+            }
+
+        }
+        return res;
+    }
+
+    public List<Journey> searchAllJourneyWUser(String user) {
+        List<Journey> js = findAllJourneys();
+        List<Journey> res = new ArrayList<>();
+        for(Journey j : js){
+            if(j.getOrganizer().compareToIgnoreCase(user) != 0 && !j.isFinished() && !j.getParticipants().contains(user)){
+                res.add(j);
+            }
+        }
+
+        return res;
+    }
+
+    public List<Journey> searchAllJourney() {
+        List<Journey> js = findAllJourneys();
+        List<Journey> res = new ArrayList<>();
+        for(Journey j : js){
+            if(j.isFinished()){
+                res.add(j);
+            }
+        }
+
         return res;
     }
 }
