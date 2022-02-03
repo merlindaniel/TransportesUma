@@ -89,7 +89,6 @@ public class JourneyService {
             journeyInBD.setStartDate(journey.getStartDate());
             journeyInBD.setFinished(journey.isFinished());
             journeyInBD.setExam(journey.isExam());
-    f
             return journeyRepository.save(journeyInBD);
         }
 

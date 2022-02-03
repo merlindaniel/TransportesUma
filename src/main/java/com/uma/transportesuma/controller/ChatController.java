@@ -159,7 +159,7 @@ public class ChatController {
                 throw new Exception("Error: Alguno de los participantes del chat, no existen.");
             }
 
-            return new ResponseEntity<>(, HttpStatus.OK);
+            return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
