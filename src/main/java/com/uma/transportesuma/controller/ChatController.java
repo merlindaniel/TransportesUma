@@ -89,7 +89,7 @@ public class ChatController {
 
     // ---------------- With authentication ----------------
 
-    @GetMapping("current/")
+    @GetMapping("/current/")
     public ResponseEntity<List<Chat>> findAllChatsForCurrentUser() {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -109,7 +109,7 @@ public class ChatController {
         }
     }
 
-    @GetMapping("current/{id}")
+    @GetMapping("/current/{id}")
     public ResponseEntity<Chat> findChatForCurrentUser(@PathVariable final String id) {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -135,7 +135,7 @@ public class ChatController {
         }
     }
 
-    @PostMapping("current/{id}")
+    @PostMapping("/current/{id}")
     public ResponseEntity<Chat> addChatForCurrentUser(@RequestBody Chat chat) {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -165,7 +165,7 @@ public class ChatController {
         }
     }
 
-    @PutMapping("current/{id}")
+    @PutMapping("/current/{id}")
     public ResponseEntity<Chat> updateChatForCurrentUser(@PathVariable final String id, @RequestBody Chat chat) {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
