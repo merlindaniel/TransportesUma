@@ -35,7 +35,7 @@ public class ChatController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/findChat/{id}")
     public ResponseEntity<Chat> findChatById(@PathVariable final String id) {
         try {
             return new ResponseEntity<>(chatService.findChatById(id).get(), HttpStatus.OK);
@@ -89,7 +89,7 @@ public class ChatController {
 
     // ---------------- With authentication ----------------
 
-    @GetMapping("current/")
+    @GetMapping("/current")
     public ResponseEntity<List<Chat>> findAllChatsForCurrentUser() {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -102,14 +102,17 @@ public class ChatController {
             } else {
                 user = u.get();
                 chats = chatService.findChatsByUser(user);
+                System.out.println(chats.toString());
             }
             return new ResponseEntity<>(chats, HttpStatus.OK);
         } catch (Exception ex) {
+            System.out.println(ex.toString());
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
         }
     }
 
-    @GetMapping("current/{id}")
+    @GetMapping("/current/{id}")
     public ResponseEntity<Chat> findChatForCurrentUser(@PathVariable final String id) {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -135,15 +138,17 @@ public class ChatController {
         }
     }
 
-    @PostMapping("current/{id}")
+    @PostMapping("/current/newChat")
     public ResponseEntity<Chat> addChatForCurrentUser(@RequestBody Chat chat) {
         try {
+            System.out.println("Estamos en el add chat function");
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String usuarioActual = userDetails.getUsername();
             Optional<User> u = userService.findUserByUsername(usuarioActual);
             User user = null;
             if(u.isEmpty()){
                 throw new Exception("Error: Usuario no encontrado.");
+
             } else {
                 user = u.get();
 
@@ -165,7 +170,7 @@ public class ChatController {
         }
     }
 
-    @PutMapping("current/{id}")
+    @PutMapping("/current/{id}")
     public ResponseEntity<Chat> updateChatForCurrentUser(@PathVariable final String id, @RequestBody Chat chat) {
         try {
             UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

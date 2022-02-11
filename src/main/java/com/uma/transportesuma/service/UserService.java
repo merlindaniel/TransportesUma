@@ -2,6 +2,7 @@ package com.uma.transportesuma.service;
 
 import com.sun.mail.util.MailSSLSocketFactory;
 import com.uma.transportesuma.document.User;
+import com.uma.transportesuma.document.chat.BasicUser;
 import com.uma.transportesuma.dto.UserDTO;
 import com.uma.transportesuma.exception.UserError;
 import com.uma.transportesuma.repository.UserRepository;
@@ -142,6 +143,16 @@ public class UserService {
         message.setSubject("Prueba subject");
         message.setText("Prueba texto");
         mailSender.send(message);
+    }
+
+    public BasicUser searchUser(String query){
+        Optional<User> user = this.findUser(query);
+        if(user.isPresent()){
+            return new BasicUser(user.get().getId(), user.get().getName(),
+                    user.get().getEmail(), user.get().getUsername(), user.get().getPicture());
+        }else{
+            return null;
+        }
     }
 
 }

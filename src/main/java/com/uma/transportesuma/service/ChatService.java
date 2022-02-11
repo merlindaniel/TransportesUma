@@ -19,9 +19,6 @@ public class ChatService {
     private final UserService userService;
 
     @Autowired
-    private final ChatService chatService;
-
-    @Autowired
     private final ChatRepository chatRepository;
 
     // ---------- Queries ----------

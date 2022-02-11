@@ -1,6 +1,7 @@
 package com.uma.transportesuma.controller;
 
 import com.uma.transportesuma.document.User;
+import com.uma.transportesuma.document.chat.BasicUser;
 import com.uma.transportesuma.document.vehicle.Vehicle;
 import com.uma.transportesuma.dto.UserDTO;
 import com.uma.transportesuma.exception.UserError;
@@ -148,6 +149,19 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception ex) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/searchUser/{query}")
+    public ResponseEntity<BasicUser> searchUser(@PathVariable final String query) {
+        try {
+            BasicUser result = userService.searchUser(query);
+            if(result == null){
+                throw new Exception("Error: Usuario no encontrado.");
+            }
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 }
