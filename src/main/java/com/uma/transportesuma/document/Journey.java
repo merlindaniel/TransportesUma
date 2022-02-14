@@ -63,11 +63,14 @@ public class Journey implements Serializable {
     @NonNull
     private boolean finished;
 
-    public Journey(@NonNull String name, @NonNull String description, @NonNull Place origin, @NonNull Place destination, @NonNull int numberParticipants, @NonNull Vehicle vehicle, double price, Date startDate, boolean exam, boolean finished) {
-        this(name, description, origin, destination, null, new HashSet<>(), numberParticipants, vehicle, price, startDate, exam, finished);
+    @NonNull
+    private boolean onlinePayment;
+
+    public Journey(@NonNull String name, @NonNull String description, @NonNull Place origin, @NonNull Place destination, @NonNull int numberParticipants, @NonNull Vehicle vehicle, double price, Date startDate, boolean exam, boolean finished, boolean onlinePayment) {
+        this(name, description, origin, destination, null, new HashSet<>(), numberParticipants, vehicle, price, startDate, exam, finished, onlinePayment);
     }
 
-    public Journey(@NonNull String name, @NonNull String description, @NonNull Place origin, @NonNull Place destination, @NonNull String organizer, @NonNull Set<String> participants, @NonNull int numberParticipants, @NonNull Vehicle vehicle, double price, Date startDate, boolean exam, boolean finished) {
+    public Journey(@NonNull String name, @NonNull String description, @NonNull Place origin, @NonNull Place destination, @NonNull String organizer, @NonNull Set<String> participants, @NonNull int numberParticipants, @NonNull Vehicle vehicle, double price, Date startDate, boolean exam, boolean finished, boolean onlinePayment) {
         this.origin = origin;
         this.destination = destination;
         this.organizer = organizer;
@@ -78,6 +81,7 @@ public class Journey implements Serializable {
         this.startDate = startDate;
         this.exam = exam;
         this.finished = finished;
+        this.onlinePayment = onlinePayment;
     }
 
     public void addParticipant(User user) {
