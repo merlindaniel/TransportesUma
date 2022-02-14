@@ -154,7 +154,7 @@ public class StripeService {
         AccountLinkCreateParams params = AccountLinkCreateParams
                 .builder()
                 .setAccount(accountId)
-                .setRefreshUrl("http://localhost:8080/secured/private/start/account")
+                .setRefreshUrl("http://localhost:8080/")
                 .setReturnUrl("http://localhost:8080/")
                 .setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
                 .build();
