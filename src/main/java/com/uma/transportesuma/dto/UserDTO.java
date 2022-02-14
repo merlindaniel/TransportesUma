@@ -24,4 +24,6 @@ public class UserDTO {
 
     private String picture;
 
+    private String stripeAccount;
+
 }

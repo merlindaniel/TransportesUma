@@ -1,6 +1,7 @@
 package com.uma.transportesuma;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.stripe.Stripe;
 import com.uma.transportesuma.document.User;
 import com.uma.transportesuma.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,27 +16,36 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+
 
 @SpringBootApplication
 public class TransportesumaApplication {
 
-    @Bean
+    /*@Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 
     @Autowired
     @Qualifier("restTemplate")
-    private RestTemplate restTemplate;
+    private RestTemplate restTemplate;*/
+
+
+    @PostConstruct
+    public void setup(){
+        Stripe.apiKey="sk_test_51KT4GvD15nb6EUWAR6Npgs5ja93X3FN4t9R45EgbC4gN7pAPuTwoy6dZdN8rpZG7ZYByYWdp8NJvGHKoGscmsFvo003iuWe5n0";
+    }
+
 
     public static void main(String[] args) {
         SpringApplication.run(TransportesumaApplication.class, args);
     }
 
-    @Bean
+    /*@Bean
     CommandLineRunner runner(@Autowired UserService userService) {
         return args -> {
-            /*if (false)
+            if (false)
                 userService.removeAllUsers();
 
             if (false) {
@@ -64,7 +74,7 @@ public class TransportesumaApplication {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-            }*/
+            }
         };
-    }
+    }*/
 }

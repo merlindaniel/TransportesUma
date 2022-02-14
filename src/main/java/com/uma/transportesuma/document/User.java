@@ -40,6 +40,8 @@ public class User implements Serializable {
 
     private String picture;
 
+    private String stripeAccount;
+
     public User(@NonNull String username, @NonNull String name, @NonNull String email, @NonNull String password) {
         this.username = username;
         this.name = name;
@@ -55,6 +57,12 @@ public class User implements Serializable {
             user.setPicture("");
         else
             user.setPicture(userDTO.getPicture());
+
+        if(userDTO.getStripeAccount() == null)
+            user.setStripeAccount("");
+        else
+            user.setStripeAccount(userDTO.getStripeAccount());
+
         return user;
     }
 
