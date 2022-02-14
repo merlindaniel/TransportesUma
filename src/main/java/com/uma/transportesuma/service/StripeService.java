@@ -177,6 +177,26 @@ public class StripeService {
     }
 
 
+    public boolean todoConfigurado() throws Exception {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String usuarioActual = userDetails.getUsername();
+
+        Optional<User> u = userRepository.findByUsername(usuarioActual);
+
+        if(!u.isPresent())
+            throw new Exception("El usuario no ha sido encontrado");
+
+        User thisUser = u.get();
+        if(thisUser.getStripeAccount() == null || thisUser.getStripeAccount().isEmpty())
+            return false;
+
+        Account account = Account.retrieve(thisUser.getStripeAccount());
+
+        if(account.getDetailsSubmitted() && account.getChargesEnabled())
+            return true;
+        else
+            return false;
+    }
 
 
 
