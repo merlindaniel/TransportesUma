@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>Tus Viajes - ShareTravel</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+    rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <!-- development version, includes helpful console warnings -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js" defer></script>
+  <script src="./vue/vue.js" defer></script>
+  <script src="vue/node_modules/vue-cookies/vue-cookies.js" defer></script>
+  <script src="./js/paths.js" defer></script>
+  <script src="vue/axios.js"></script>
+  <script src="js/journeys.js" defer></script>
+  <script src="vue/axios.js"></script>
+
+  <!--Google OAuth 2.0-->
+  <meta name="google-signin-client_id"
+    content="634135800903-t4lnnd9m66u3lr82d4h4ncat75qbt1br.apps.googleusercontent.com">
+  <script>
+    function onLoad() {
+      console.log("Entra el onLoad");
+      gapi.load('auth2', function () {
+        console.log("Entra a la funcion - antes");
+        gapi.auth2.init();
+        console.log("Entra a la funcion - despues");
+      });
+    }
+  </script>
+  <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top header-inner-pages">
+      <div class="container d-flex align-items-center">
+
+        <h1 class="logo me-auto"><a href="index.html">ShareTravel</a></h1>
+        <!-- Uncomment below if you prefer to use an image logo -->
+        <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+        <nav v-if="tokenConBearer === null" id="navbar" class="navbar">
+          <ul>
+            <li><a class="nav-link scrollto active" href="index.html">Inicio</a></li>
+            <li><a class="nav-link scrollto" href="search.html">Buscar</a></li>
+            <li><a class="getstarted scrollto" href="login.html">Iniciar Sesión</a></li>
+          </ul>
+          <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
+
+        <nav v-else id="navbar" class="navbar">
+          <ul>
+            <li><a class="nav-link scrollto" href="index.html">Inicio</a></li>
+            <li><a class="nav-link scrollto" href="search.html">Buscar</a></li>
+            <li><a class="nav-link scrollto" href="organize-journey.html">Publicar viaje</a></li>
+            <li><a class="nav-link scrollto active" href="your-travels.html">Tus viajes</a></li>
+            <li><a class="nav-link scrollto" href="mensajes.html">Mensajes</a></li>
+            <li><a class="nav-link scrollto" href="profile.html">Mi perfil</a></li>
+            <li><button class="getstarted scrollto btn btn-outline-primary" id="logoutBtn" @click="logout">Cerrar sesión</button></li>
+          </ul>
+          <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
+
+      </div>
+    </header><!-- End Header -->
+
+    <!-- ======= Hero Section ======= -->
+    <section id="viajes" class="d-flex align-items-center">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div v-if="all == true">
+              <h1 class="text-center">Todos los viajes:</h1>
+            </div>
+            <div v-else>
+              <h1 class="text-center">Viaje de {{origin}} a {{destination}}</h1>
+              <h2 class="text-center">{{date}}, {{nSpots}} plazas</h2>
+            </div>
+
+          </div>
+          <ol>
+            <li v-for="(journey, key) of journeysListDef" :key="journey.id">
+              <a class="viaje d-flex align-items-start" data-aos="zoom-in" data-aos-delay="100"
+                :href="'journey.html?journey='+journey.id+'&nSpots='+nSpots">
+                <div class="pic">
+                  <img :src="journey.organizer.picture" class="img-fluid" alt="" />
+                </div>
+                <div class="viaje-info">
+                  <h4>{{journey.name}}</h4>
+                  <p>{{journey.hour}}</p>
+                  <!--&rarr;-->
+                  <p>{{journey.organizer.name}}</p>
+                  <span></span>
+                  <p>{{journey.numberSpots}} plazas restantes</p>
+                </div>
+                <div class="push"></div>
+                <div class="precio">
+                  <h4>{{journey.price}} €</h4>
+                </div>
+              </a>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section> <!-- End Hero -->
+
+
+
+
+
+  </div>
+
+  <!-- ======= Footer ======= -->
+  <footer id="footer">
+
+    <div class="footer-top">
+      <div class="container">
+        <div class="row">
+
+          <div class="col-md-4 footer-contact">
+            <h3>ShareTravel</h3>
+            <p>
+              UMA<br>
+              Universidad de Málaga<br>
+              España<br><br>
+            </p>
+          </div>
+
+          <div class="col-md-4 footer-links">
+            <h4>Links</h4>
+            <ul>
+              <li><i class="bx bx-chevron-right"></i> <a href="./index.html">Home</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="./login.html">Iniciar Sesión</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="./signup.html">Registrarse</a></li>
+              <li><i class="bx bx-chevron-right"></i> <a href="./search.html">Buscar</a></li>
+            </ul>
+          </div>
+
+
+          <div class="col-md-4 footer-links">
+            <h4>Nuestras redes sociales</h4>
+            <div class="social-links mt-3">
+              <a href="#" class="twitter"><i class="bx bxl-twitter"></i></a>
+              <a href="#" class="facebook"><i class="bx bxl-facebook"></i></a>
+              <a href="#" class="instagram"><i class="bx bxl-instagram"></i></a>
+              <a href="#" class="google-plus"><i class="bx bxl-skype"></i></a>
+              <a href="#" class="linkedin"><i class="bx bxl-linkedin"></i></a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-bottom clearfix">
+      <div class="copyright">
+        <strong><span>ShareTravel</span></strong>.
+      </div>
+      <div class="credits">
+        <a href="https://www.uma.es/">Universidad de Málaga</a>
+      </div>
+    </div>
+  </footer><!-- End Footer -->
+
+  <div id="preloader"></div>
+  <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+      class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Mi perfil - ShareTravel</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <link href="./css/customBorders.css" rel="stylesheet">
+    <link href="./css/objective-img.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/image-cropper.css" rel="stylesheet">
+    <script src="vue/vue.js"></script>
+    <script src="./vue/node_modules/vue-cookies/vue-cookies.js"></script>
+    <script src="vue/axios.js"></script>
+    <script src="./js/logout.js" defer></script>
+
+    <!--Google OAuth 2.0-->
+    <meta name="google-signin-client_id"
+        content="634135800903-t4lnnd9m66u3lr82d4h4ncat75qbt1br.apps.googleusercontent.com">
+    <script>
+        function onLoad() {
+            console.log("Entra el onLoad");
+            gapi.load('auth2', function () {
+                console.log("Entra a la funcion - antes");
+                gapi.auth2.init();
+                console.log("Entra a la funcion - despues");
+            });
+        }
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+
+
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top header-inner-pages">
+        <div class="container d-flex align-items-center">
+
+            <h1 class="logo me-auto"><a href="index.html">ShareTravel</a></h1>
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a class="nav-link scrollto" href="index.html">Inicio</a></li>
+                    <li><a class="nav-link scrollto" href="search.html">Buscar</a></li>
+                    <li><a class="nav-link scrollto" href="organize-journey.html">Publicar viaje</a></li>
+                    <li><a class="nav-link scrollto" href="your-travels.html">Tus viajes</a></li>
+                    <li><a class="nav-link scrollto" href="mensajes.html">Mensajes</a></li>
+                    <li><a class="nav-link scrollto" href="profile.html">Mi perfil</a></li>
+                    <li><button class="getstarted scrollto btn btn-outline-primary" id="logoutBtn">Cerrar
+                            sesión</button></li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+
+        </div>
+    </header><!-- End Header -->
+
+    <main id="main" class="bg-light">
+        <div id="vueApp">
+            <section class="inner-page mt-5">
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-11 col-md-10 col-lg-8" data-aos="fade-up" data-aos-delay="200">
+
+                            <!-- Datos Personales -->
+                            <div class="list-group custom-rounded-borders shadow-sm bg-white">
+                                <div class="list-group-item px-3 py-4">
+                                    <div class="section-title">
+                                        <h2>{{user.username}}</h2>
+                                    </div>
+                                    <div class="mx-auto image-cropper">
+                                        <img v-if="!user.picture"
+                                            class="rounded-circle mx-auto mt-3 d-block img-responsive"
+                                            src="https://cdn.blablacar.com/comuto3/images/avatar/pixar/passenger-m-02.svg"
+                                            width="200px" height="200px" />
+                                        <img v-if="user.picture"
+                                            class="rounded-circle mx-auto mt-3 d-block img-responsive"
+                                            :src="user.picture" width="200px" height="200px" />
+
+                                    </div>
+                                </div>
+                                <div class="list-group-item px-md-5 py-4 px-3">
+                                    <div class="d-flex flex-row">
+                                        <h3>Datos personales</h3>
+
+                                    </div>
+                                    <p>Edite los campos que vea necesario</p>
+                                    <!-- Mensaje de error -->
+                                    <div v-if="errors && errors.length > 0"
+                                        class="card pt-3 pb-0 my-1 bg-danger text-white">
+                                        <ul>
+                                            <li v-for="error in errors" class="fw-bold">{{error}}</li>
+                                        </ul>
+                                    </div>
+                                    <hr>
+
+                                    <div class="row g-3 px-3 mb-5">
+                                        <div class="col-12">
+                                            <label for="profile-pic" class="form-label">Foto de perfil</label>
+                                            <input class="form-control" type="file" id="profile-pic"
+                                                @change="updateImg">
+                                        </div>
+
+                                        <div class="col-12">
+                                            <label for="edition-name" class="form-label">Nombre</label>
+                                            <input id="edition-name" class="form-control fw-bold" type="text"
+                                                placeholder="Nombre" v-model="editionUser.name" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="edition-username" class="form-label">Usuario</label>
+                                            <input id="edition-username" class="form-control fw-bold" type="text"
+                                                placeholder="Nombre de usuario" v-model="editionUser.username" disabled
+                                                required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="edition-email" class="form-label">Email</label>
+                                            <input id="edition-email" class="form-control fw-bold" type="email"
+                                                placeholder="Email" v-model="editionUser.email" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="edition-password" class="form-label">Contraseña</label>
+                                            <input id="edition-password" class="form-control fw-bold" type="password"
+                                                placeholder="Contraseña" v-model="editionUser.password" required>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="edition-password-repeat" class="form-label">Repite
+                                                Contraseña</label>
+                                            <input id="edition-password-repeat" class="form-control fw-bold"
+                                                type="password" placeholder="Repetir contraseña"
+                                                v-model="editionUser.password" required>
+                                        </div>
+
+                                    </div>
+
+                                    <hr>
+                                    <div class="d-flex flex-row mt-4">
+                                        <a :href="'profile.html?user=' + userId" v-if="isLoggedUser"
+                                            class="btn btn-outline-dark rounded-pill px-4">Cancelar</a>
+                                        <div class="flex-fill"></div>
+                                        <button v-on:click="userEditionSubmit" v-if="isLoggedUser"
+                                            class="btn btn-success rounded-pill px-4">Confirmar</button>
+                                    </div>
+                                </div>
+
+                                <div class="list-group-item px-md-5 py-4 px-3">
+                                    <div class="d-flex flex-row">
+                                        <h3>Ajustes adicionales</h3>
+
+                                    </div>
+                                    <p>Puede eliminar su cuenta si así lo desea</p>
+                                    <hr>
+                                    <button v-on:click="deleteUser" class="btn btn-danger rounded-pill px-4">Eliminar mi
+                                        cuenta</button>
+                                </div>
+
+                            </div>
+
+                            <!-- Vehículos -->
+                            <div class="list-group custom-rounded-borders shadow-sm bg-white mt-4">
+                                <div class="list-group-item px-3 py-4">
+                                    <div class="section-title">
+                                        <h2>Vehículos</h2>
+                                    </div>
+                                    <div v-if="isLoggedUser" class="row justify-content-center">
+                                        <a href="vehicle-crud.html"
+                                            class="col-auto btn btn-primary px-5 rounded-pill">Añadir vehículo</a>
+                                    </div>
+                                </div>
+
+                                <div class="list-group-item px-md-5 py-4 px-3" v-for="vehicle in vehicles">
+                                    <div class="image-cropper mb-3">
+                                        <img id="picture" v-if="vehicle.picture == null || !vehicle.picture"
+                                            class="rounded mx-auto d-block mt-5 img-responsive" src="assets/img/car.png"
+                                            width="280px" height="180px" />
+                                        <img id="picture" v-if="vehicle.picture"
+                                            class="rounded mx-auto d-block mt-5 img-responsive" :src="vehicle.picture"
+                                            width="280px" height="180px" />
+                                    </div>
+                                    <p class="lead">Apodo del vehículo: <b>{{vehicle.name}}</b> </p>
+
+                                    <p class="lead">Matricula: <b>{{vehicle.registration}}</b> </p>
+
+                                    <p class="lead">Modelo: <b>{{vehicle.model}}</b> </p>
+
+                                    <p class="lead">Combustible: <b>{{vehicle.combustible}}</b> </p>
+
+                                    <div class="row justify-content-center">
+                                        <a :href="'vehicle-crud.html?vehicle=' + vehicle.id"
+                                            class="col-auto btn btn-success rounded-pill mt-4 px-5" type="button">Editar
+                                            vehículo</a>
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+
+    <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+</body>
+<script src="vue/profile.js"></script>
+
+</html>

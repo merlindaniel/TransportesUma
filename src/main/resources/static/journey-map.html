@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Mi viaje - Mapa</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/image-cropper.css" rel="stylesheet">
+    <script src="vue/axios.js"></script>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin="" defer></script>
+
+    <!--VUE 2.0-->
+    <script src="vue/axios.js"></script>
+    <script src="./vue/vue.js" defer></script>
+    <script src="./vue/node_modules/vue-cookies/vue-cookies.js" defer></script>
+    <script src="./js/paths.js" defer></script>
+    <script src="./js/myJourney-map.js" defer></script>
+    <script src="./js/logout.js" defer></script>
+    
+    <!--Google OAuth 2.0-->
+    <meta name="google-signin-client_id"
+        content="634135800903-t4lnnd9m66u3lr82d4h4ncat75qbt1br.apps.googleusercontent.com">
+    <script>
+        function onLoad() {
+            console.log("Entra el onLoad");
+            gapi.load('auth2', function () {
+                console.log("Entra a la funcion - antes");
+                gapi.auth2.init();
+                console.log("Entra a la funcion - despues");
+            });
+        }
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+
+
+    <style>
+        #map {
+            height: 700px;
+            margin-bottom: 50px;
+        }
+
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top " style="background-color: #37517e;">
+        <div class="container d-flex align-items-center">
+
+            <h1 class="logo me-auto"><a href="index.html">ShareTravel</a></h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+            <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a class="nav-link scrollto" href="index.html">Inicio</a></li>
+                    <li><a class="nav-link scrollto" href="search.html">Buscar</a></li>
+                    <li><a class="nav-link scrollto" href="organize-journey.html">Publicar viaje</a></li>
+                    <li><a class="nav-link scrollto" href="your-travels.html">Tus viajes</a></li>
+                    <li><a class="nav-link scrollto" href="mensajes.html">Mensajes</a></li>
+                    <li><a class="nav-link scrollto" href="profile.html">Mi perfil</a></li>
+                    <li><button class="getstarted scrollto btn btn-outline-primary" id="logoutBtn">Cerrar
+                            sesión</button></li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+
+        </div>
+    </header><!-- End Header -->
+
+    <main id="main">
+        <section class="inner-page mt-5">
+            <div class="container">
+                <div id="app" v-cloak>
+                    <div class="section-title">
+                        <h2>{{journeyName}}</h2>
+                    </div>
+
+
+                    <div class="row justify-content-center">
+                        <div class="col-11">
+                            <div class="list-group shadow-sm">
+                                <div class="list-group-item pt-4 px-4 px-sm-5 pt-sm-5">
+                                    <h3>Mapa del trayecto</h3>
+                                    <hr>
+                                    <div id="map">
+
+                                    </div>
+                                </div>
+                                <div class="list-group-item p-4 p-sm-5">
+                                    <h3>Rutas</h3>
+                                    <hr>
+                                    <div class="btn-group" role="group" aria-label="First group">
+                                        <button type="button" class="btn btn-primary" :disabled="loadingRouteDirect"
+                                            @click="getDirectRoute">
+                                            <span v-if="loadingRouteDirect" class="spinner-grow spinner-grow-sm"
+                                                role="status" aria-hidden="true"></span>
+                                            Ruta mas corta
+                                        </button>
+                                        <button type="button" class="btn btn-primary"
+                                            @click="getRouteWithFuelstationStop"
+                                            :disabled="loadingRouteWithFuelstation">
+                                            <span v-if="loadingRouteWithFuelstation"
+                                                class="spinner-grow spinner-grow-sm" role="status"
+                                                aria-hidden="true"></span>
+                                            Ruta por una gasolinera
+                                        </button>
+                                        <button type="button" class="btn btn-primary" @click="cleanRoutes">Limpiar
+                                            rutas</button>
+                                    </div>
+                                </div>
+                                <div v-if="lastRouteSummary.length === 1" class="list-group-item p-4 p-sm-5">
+                                    <h3>Detalles de la ruta actual</h3>
+                                    <hr>
+                                    <p><b>Longitud del trayecto: </b>{{lastRouteSummary[0].lengthInMeters}} metros.
+                                    <p><b>Tiempo de trayecto estimado: </b>{{lastRouteSummary[0].travelTimeInSeconds}}
+                                        segundos.
+                                    <p><b>Tiempo de retraso debido al tráfico:
+                                        </b>{{lastRouteSummary[0].trafficDelayInSeconds}} segundos.
+                                    <p><b>Longitud total de todo el trayecto donde hay tráfico:
+                                        </b>{{lastRouteSummary[0].trafficLengthInMeters}} metros.
+                                </div>
+                                <div v-else-if="lastRouteSummary.length === 2" class="list-group-item p-4 p-sm-5">
+                                    <h3>Detalles de la ruta actual</h3>
+                                    <hr>
+                                    <p><b>Longitud del trayecto hasta la gasolinera:
+                                        </b>{{lastRouteSummary[0].lengthInMeters}} metros.
+                                    <p><b>Tiempo de trayecto estimado hasta la gasolinera:
+                                        </b>{{lastRouteSummary[0].travelTimeInSeconds}} segundos.
+                                    <p><b>Tiempo de retraso debido al tráfico hasta la gasolinera:
+                                        </b>{{lastRouteSummary[0].trafficDelayInSeconds}} segundos.
+                                    <p><b>Longitud total de todo el trayecto donde hay tráfico hasta la gasolinera:
+                                        </b>{{lastRouteSummary[0].trafficLengthInMeters}} metros.
+                                        <hr>
+                                    <p><b>Longitud del trayecto a partir de la gasolinera:
+                                        </b>{{lastRouteSummary[1].lengthInMeters}} metros.
+                                    <p><b>Tiempo de trayecto estimado a partir de la gasolinera:
+                                        </b>{{lastRouteSummary[1].travelTimeInSeconds}} segundos.
+                                    <p><b>Tiempo de retraso debido al tráfico a partir de la gasolinera:
+                                        </b>{{lastRouteSummary[1].trafficDelayInSeconds}} segundos.
+                                    <p><b>Longitud total de todo el trayecto donde hay tráfico a partir de la
+                                            gasolinera: </b>{{lastRouteSummary[1].trafficLengthInMeters}} metros.
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Toast-->
+                    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1000">
+                        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="toast-header">
+                                <strong class="me-auto">ShareTravel</strong>
+                                <small>Info</small>
+                                <button type="button" class="btn-close" data-bs-dismiss="toast"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="toast-body">
+                                Se ha cargado correctamente la ruta. También se puede ver los detalles de la ruta abajo!
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+    <!-- <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a> -->
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+    <script src="bootstrap/dist/js/bootstrap.bundle.js"></script>
+</body>
+
+</html>

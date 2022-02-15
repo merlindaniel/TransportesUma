@@ -45,11 +45,29 @@ public class WebSecurity extends WebSecurityConfigurerAdapter{
         http.cors().and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                    .antMatchers("/authentication/user/**").permitAll()
-                    .antMatchers(POST, "/api/users/**").permitAll()
-                    .antMatchers("/api/stripe/webhook").permitAll()
-                .antMatchers(GET,"/api/opendata/get/places/**", "/api/journeys/**", "/api/users/**").permitAll()
-                .anyRequest().authenticated();
+                    .antMatchers(PUT, "/api/journeys/**").authenticated()
+                    .antMatchers(POST, "/api/journeys/**").authenticated()
+                    .antMatchers(DELETE, "/api/journeys/**").authenticated()
+
+                    .antMatchers(PUT,"/api/users/**").authenticated()
+                    .antMatchers(DELETE,"/api/users/**").authenticated()
+
+                    .antMatchers(PUT, "/api/vehicles/**").authenticated()
+                    .antMatchers(POST, "/api/vehicles/**").authenticated()
+                    .antMatchers(DELETE, "/api/vehicles/**").authenticated()
+
+                    .antMatchers("/api/chats/**").authenticated()
+
+                    .antMatchers("/api/stripe/url", "/api/stripe/enable", "/api/stripe/payment-intent").authenticated()
+
+                    //.antMatchers("/api/opendata/**").authenticated()
+                    //.antMatchers(GET, "/api/users/**").authenticated()
+                .anyRequest().permitAll();
+                    //.antMatchers("/authentication/user/**").permitAll()
+                    //.antMatchers(POST, "/api/users/**").permitAll()
+                    //.antMatchers("/api/stripe/webhook").permitAll()
+                //.antMatchers(GET,"/api/opendata/get/places/**", "/api/journeys/**", "/api/users/**").permitAll()
+                //.anyRequest().authenticated();
         http.addFilterBefore(getJwtFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 

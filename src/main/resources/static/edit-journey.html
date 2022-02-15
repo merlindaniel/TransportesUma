@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Mi viaje</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/image-cropper.css" rel="stylesheet">
+    <script src="vue/axios.js"></script>
+
+    <!--VUE 2.0-->
+    <script src="vue/axios.js"></script>
+    <script src="./vue/vue.js" defer></script>
+    <script src="./vue/node_modules/vue-cookies/vue-cookies.js" defer></script>
+    <script src="./js/paths.js" defer></script>
+    <script src="./js/myJourney.js" defer></script>
+    <script src="./js/logout.js" defer></script>
+
+    <!--Google OAuth 2.0-->
+    <meta name="google-signin-client_id"
+        content="634135800903-t4lnnd9m66u3lr82d4h4ncat75qbt1br.apps.googleusercontent.com">
+    <script>
+        function onLoad() {
+            console.log("Entra el onLoad");
+            gapi.load('auth2', function () {
+                console.log("Entra a la funcion - antes");
+                gapi.auth2.init();
+                console.log("Entra a la funcion - despues");
+            });
+        }
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top " style="background-color: #37517e;">
+        <div class="container d-flex align-items-center">
+
+            <h1 class="logo me-auto"><a href="index.html">ShareTravel</a></h1>
+            <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+            <!-- Uncomment below if you prefer to use an image logo -->
+
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a class="nav-link scrollto" href="index.html">Inicio</a></li>
+                    <li><a class="nav-link scrollto" href="search.html">Buscar</a></li>
+                    <li><a class="nav-link scrollto" href="organize-journey.html">Publicar viaje</a></li>
+                    <li><a class="nav-link scrollto" href="your-travels.html">Tus viajes</a></li>
+                    <li><a class="nav-link scrollto" href="mensajes.html">Mensajes</a></li>
+                    <li><a class="nav-link scrollto" href="profile.html">Mi perfil</a></li>
+                    <li><button class="getstarted scrollto btn btn-outline-primary" id="logoutBtn">Cerrar
+                            sesión</button></li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+
+        </div>
+    </header><!-- End Header -->
+    <!-- ======= Hero Section ======= -->
+    <section id="hero">
+
+        <div class="container-lg pt-5 d-flex align-items-center justify-content-center" id="journeysDetail">
+            <div class="row col-8">
+                <div v-if="journey.participants.length > 0">
+                    <div class="section-title pt-5 mt-5">
+                        <h2>No es posible editar los datos del viaje</h2>
+                        <p>Esta acción sólo es posible cuando aún no hay plazas reservadas.</p>
+                        <p>Si gustas puedes eliminar el viaje:</p>
+                        <div class="row text-center mx-auto">
+                            <a class="col-2 col-sm-4 btn-primary rounded-pill"
+                                :href="'my-journey.html?journey='+journey.id">Volver</a>
+                            <a class="col-1"></a>
+                            <a class="col-2 col-sm-4 btn-danger rounded-pill"
+                                :href="'confirm-delete-journey.html?journey='+journey.id">Eliminar</a>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="!journey.participants.length > 0" class="row">
+
+                    <div class="col-12">
+                        <h1 class="text-center">Editar viaje</h1>
+
+                    </div>
+
+                    <div class="col-12 mx-auto d-flex flex-column justify-content-center pt-4 " data-aos="fade-up"
+                        data-aos-delay="200">
+
+                        <div class="row mb-4">
+                            <div class="col-12 d-flex justify-content-center justify-content-lg-center mt-3 inputCustom"
+                                data-aos="fade-up" data-aos-delay="200">
+                                <button v-on:click="updateJourney" class="btn btn-success rounded-pill w-25"
+                                    type="button">Confirmar</button>
+                                <a :href="'my-journey.html?journey='+journey.id"
+                                    class="btn btn-dark rounded-pill w-25 mx-2" type="button">Cancelar</a>
+                            </div>
+                        </div>
+
+                        <!-- Mensaje de error -->
+                        <div v-if="errors && errors.length > 0" class="card pt-3 pb-0 my-1 bg-danger text-white">
+                            <ul>
+                                <li v-for="error in errors" class="fw-bold">{{error}}</li>
+                            </ul>
+                        </div>
+
+                        <!-- Origen -->
+                        <div class="card p-2 my-1">
+                            <div class="mx-1">
+                                <label class="lead">Origen:</label>
+                                <input
+                                    class="form-control dropdown-toggle custom-dropdown-size fw-bold m-1 customFirstBorders"
+                                    list="listaOrigenes" type="text" placeholder="Origen" v-model="origen"
+                                    v-on:input="obtenerListaOrigenes" required />
+                                <datalist id="listaOrigenes">
+                                    <option v-for="origenes in listaOrigenes">{{origenes.address}}</option>
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <!-- Destino-->
+                        <div class="card p-2 my-1">
+                            <div class="mx-1">
+                                <label class="lead">Destino:</label>
+                                <input
+                                    class="form-control dropdown-toggle custom-dropdown-size fw-bold m-1 customFirstBorders mt-3"
+                                    list="listaDestinos" type="text" placeholder="Destino" v-model="destino"
+                                    v-on:input="obtenerListaDestinos" required />
+                                <datalist id="listaDestinos">
+                                    <option v-for="destinos in listaDestinos">{{destinos.address}}</option>
+                                </datalist>
+                            </div>
+                        </div>
+
+                        <!-- Número de plazas -->
+                        <div class="card p-2 my-1">
+                            <div class="mx-1">
+                                <label class="lead">Número de plazas:</label>
+                                <input class="form-control customFirstBorders fw-bold m-1 mt-3" type="number" min="1"
+                                    placeholder="Número de plazas" id="numberParticipants"
+                                    v-model="journey.numberParticipants" required />
+                            </div>
+                        </div>
+
+                        <!-- Precio por plaza -->
+                        <div class="card p-2 my-1">
+                            <div class="mx-1">
+                                <label class="lead">Precio por plaza:</label>
+                                <input class="form-control customFirstBorders fw-bold m-1" type="number"
+                                    placeholder="Precio por plaza" id="price" v-model="journey.price" required>
+                            </div>
+                        </div>
+
+                        <!-- Fecha -->
+                        <div class="card p-2 my-1">
+                            <div class="mx-1">
+                                <label class="lead">Fecha:</label>
+                                <input class="form-control customFirstBorders fw-bold m-1 mt-3" type="date"
+                                    placeholder="Fecha" id="fecha" v-model="fecha" required>
+                            </div>
+                        </div>
+
+
+                        <!-- Hora -->
+                        <div class="card p-2 my-1">
+                            <div class="mx-1">
+                                <label class="lead">Hora:</label>
+                                <input class="form-control customFirstBorders mt-3" type="time" placeholder="Hora"
+                                    id="hour" v-model="hour" required>
+                            </div>
+                        </div>
+
+                        <!-- Vehículo -->
+                        <div class="card p-2 my-1">
+                            <div class="mx-1">
+                                <label class="lead">Vehículo:</label>
+                                <select class="form-control customFirstBorders fw-bold m-1 mt-3" v-model="vehicleUser">
+                                    <option v-if="listaVehiculos.length === 0">Sin vehiculos</option>
+                                    <div v-else>
+                                        <option v-for="(vehicle, index) in listaVehiculos" v-bind:value="vehicle.id">
+                                            {{vehicle.name}} </option>
+                                    </div>
+                                </select required>
+                            </div>
+                        </div>
+
+
+                        <!-- Examen -->
+                        <div class="card p-2 my-1">
+                            <div class="mx-1">
+                                <select class="form-control customFirstBorders fw-bold m-1 mt-3" id="exam"
+                                    v-model="journey.exam">
+                                    <option v-bind:selected="0 === 0" disabled>Examen</option>
+                                    <option v-bind:value="true">Sí</option>
+                                    <option v-bind:value="false">No</option>
+                                </select required>
+                            </div>
+                        </div>
+
+                        <div class="col-8 mx-auto card px-5 py-2 mt-5">
+                            <h3 class="mx-auto">Ajustes adicionales:</h3>
+                            <a class="text-center btn-danger rounded-pill"
+                                :href="'confirm-delete-journey.html?journey='+journey.id">Eliminar viaje</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section><!-- End Hero -->
+
+
+    <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

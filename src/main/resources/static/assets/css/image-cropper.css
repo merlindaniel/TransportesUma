@@ -1,0 +1,10 @@
+.image-cropper {
+    position: relative;
+}
+  
+.image-cropper img {
+    display: inline;
+    margin: 0 auto;
+    margin-top: -25%;
+    margin-left: -25%;
+}

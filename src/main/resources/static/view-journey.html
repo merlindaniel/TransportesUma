@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>Mi viaje</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="assets/img/favicon.png" rel="icon">
+    <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i"
+        rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/image-cropper.css" rel="stylesheet">
+    <script src="vue/axios.js"></script>
+
+    <!--VUE 2.0-->
+    <script src="vue/axios.js"></script>
+    <script src="./vue/vue.js" defer></script>
+    <script src="./vue/node_modules/vue-cookies/vue-cookies.js" defer></script>
+    <script src="./js/paths.js" defer></script>
+    <script src="./js/viewJourney.js" defer></script>
+    <script src="./js/logout.js" defer></script>
+
+    <!--Google OAuth 2.0-->
+    <meta name="google-signin-client_id"
+        content="634135800903-t4lnnd9m66u3lr82d4h4ncat75qbt1br.apps.googleusercontent.com">
+    <script>
+        function onLoad() {
+            console.log("Entra el onLoad");
+            gapi.load('auth2', function () {
+                console.log("Entra a la funcion - antes");
+                gapi.auth2.init();
+                console.log("Entra a la funcion - despues");
+            });
+        }
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+
+</head>
+
+<body>
+
+    <!-- ======= Header ======= -->
+    <header id="header" class="fixed-top " style="background-color: #37517e;">
+        <div class="container d-flex align-items-center">
+
+            <h1 class="logo me-auto"><a href="index.html">ShareTravel</a></h1>
+            <!-- Uncomment below if you prefer to use an image logo -->
+            <!-- <a href="index.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
+
+            <nav id="navbar" class="navbar">
+                <ul>
+                    <li><a class="nav-link scrollto" href="index.html">Inicio</a></li>
+                    <li><a class="nav-link scrollto" href="search.html">Buscar</a></li>
+                    <li><a class="nav-link scrollto" href="organize-journey.html">Publicar viaje</a></li>
+                    <li><a class="nav-link scrollto" href="your-travels.html">Tus viajes</a></li>
+                    <li><a class="nav-link scrollto" href="mensajes.html">Mensajes</a></li>
+                    <li><a class="nav-link scrollto" href="profile.html">Mi perfil</a></li>
+                    <li><button class="getstarted scrollto btn btn-outline-primary" id="logoutBtn">Cerrar
+                            sesión</button></li>
+                </ul>
+                <i class="bi bi-list mobile-nav-toggle"></i>
+            </nav><!-- .navbar -->
+
+        </div>
+    </header><!-- End Header -->
+    <section id="hero" class="d-flex align-items-center" style="padding-bottom: 20px;">
+    </section><!-- End Hero -->
+
+    <main id="main">
+        <!-- ======= About Us Section ======= -->
+        <section id="journeysDetailParticipants" class="about">
+            <div class="container" data-aos="fade-up">
+                <div class="row justify-content-center">
+                    <div class="col-sm-12 col-md-12 col-lg-10" data-aos="fade-up" data-aos-delay="200">
+                        <div class="list-group custom-rounded-borders shadow-sm bg-white py-5 px-5">
+                            <div class="list-group-item px-3 py-4">
+                                <div class="section-title">
+                                    <h2>Viaje de {{journey.origin.address}} a {{journey.destination.address}}</h2>
+                                </div>
+                            </div>
+                            <div class="list-group-item px-md-5 py-4 px-3">
+                                <div class="d-flex flex-row">
+                                    <h3>Datos del viaje</h3>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-12 col-sm-12">
+                                        <p class="lead">Nombre del conductor: <b>{{loggedUser.name}}</b> </p>
+
+                                        <p class="lead">Vehículo: <b>{{journey.vehicle.model}}</b> </p>
+
+                                        <p class="lead">Fecha de salida: <b>{{date}}</b> </p>
+
+                                        <p class="lead">Hora de salida: <b>{{hour}}</b> </p>
+
+                                        <p class="lead">Precio: <b>{{journey.price}}€</b> </p>
+
+                                        <p class="lead">Número de plazas reservadas:
+                                            <b>{{journey.participants.length}}</b> </p>
+
+                                        <p class="lead">Número de plazas disponibles: <b>{{journey.numberParticipants -
+                                                journey.participants.length}}</b> </p>
+
+                                        <p class="lead">Estado:
+                                            <b>
+                                                <span
+                                                    v-if="journey.participants.length == journey.numberParticipants">Completo</span>
+                                                <span
+                                                    v-if="journey.participants.length != journey.numberParticipants">Disponible</span>
+                                            </b>
+                                        </p>
+
+                                        <p class="lead">Examen:
+                                            <b>
+                                                <span v-if="journey.exam == true">Si</span>
+                                                <span v-if="journey.exam == false">No</span>
+                                            </b>
+                                        </p>
+                                    </div>
+                                    <div class="col-lg-6 col-md-12 col-sm-12 d-lg-inline d-sm-none my-auto">
+                                        <img class="rounded-circle mx-auto mt-2 d-block img-responsive"
+                                            src="assets/img/car.png" width="200px" height="200px" />
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="list-group-item px-md-5 py-4 px-3">
+                                <div class="row content">
+                                    <div class="col-lg-12 pt-lg-0 text-center">
+                                        <div class="row justify-content-center">
+                                            <a :href="'journey-map.html?journey='+journey.id"
+                                                class="col-lg-5 col-md-5 col-sm-10 btn-learn-more">Ver mapa del
+                                                trayecto</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+        </section><!-- End About Us Section -->
+    </main>
+
+
+    <div id="preloader"></div>
+    <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
+            class="bi bi-arrow-up-short"></i></a>
+
+    <!-- Vendor JS Files -->
+    <script src="assets/vendor/aos/aos.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="assets/vendor/waypoints/noframework.waypoints.js"></script>
+    <script src="assets/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>
