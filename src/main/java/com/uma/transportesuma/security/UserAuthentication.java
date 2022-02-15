@@ -52,6 +52,13 @@ public class UserAuthentication {
         return new JWTToken(tokenJwt);
     }
 
+    @PostMapping("/google/oauth")
+    public JWTToken authenticateGoogleOAuth(){
+        return null;
+
+    }
+
+
     private String getTokenJWT(String user){
         List<GrantedAuthority> grantedAuthorities = AuthorityUtils
                 .commaSeparatedStringToAuthorityList("ROLE_USER");
