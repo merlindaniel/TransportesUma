@@ -170,8 +170,8 @@ public class StripeService {
         AccountLinkCreateParams params = AccountLinkCreateParams
                 .builder()
                 .setAccount(accountId)
-                .setRefreshUrl("http://localhost:8080/")
-                .setReturnUrl("http://localhost:8080/")
+                .setRefreshUrl("http://localhost:5500/")
+                .setReturnUrl("http://localhost:5500/")
                 .setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
                 .build();
         AccountLink accountLink = AccountLink.create(params);
@@ -185,7 +185,7 @@ public class StripeService {
     private String createLoginLink(String accountId) throws StripeException {
         LoginLinkCreateOnAccountParams params = LoginLinkCreateOnAccountParams
                 .builder()
-                .setRedirectUrl("http://localhost:8080/")
+                .setRedirectUrl("http://localhost:5500/")
                 .build();
 
         LoginLink loginLink = LoginLink.createOnAccount(accountId, params, null);
