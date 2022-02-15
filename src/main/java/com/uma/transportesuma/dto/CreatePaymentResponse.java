@@ -1,13 +1,14 @@
 package com.uma.transportesuma.dto;
 
+import lombok.*;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
 public class CreatePaymentResponse {
 
     private String clientSecret;
-    private String id;
-
-    public CreatePaymentResponse(String clientSecret, String id) {
-        this.clientSecret = clientSecret;
-        this.id = id;
-    }
 
 }

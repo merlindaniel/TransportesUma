@@ -140,7 +140,7 @@ public class StripeController {
             JsonObject elem = listaItem.get(0).getAsJsonObject();
 
             CreatePaymentResponse paymentResponse = this.stripeService.createPaymentIntent(elem.get("id_journey").getAsString());
-            return ResponseEntity.status(HttpStatus.OK).body(paymentResponse);
+            return new ResponseEntity<>(paymentResponse, HttpStatus.OK);
         } catch (Exception ex){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }

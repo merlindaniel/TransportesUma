@@ -64,6 +64,23 @@ public class StripeService {
             AccountCreateParams paramsAcc = AccountCreateParams
                     .builder()
                     .setType(AccountCreateParams.Type.EXPRESS)
+                    .setCapabilities(
+                            AccountCreateParams.Capabilities
+                                    .builder()
+                                    .setCardPayments(
+                                            AccountCreateParams.Capabilities.CardPayments
+                                                    .builder()
+                                                    .setRequested(true)
+                                                    .build()
+                                    )
+                                    .setTransfers(
+                                            AccountCreateParams.Capabilities.Transfers
+                                                    .builder()
+                                                    .setRequested(true)
+                                                    .build()
+                                    )
+                                    .build()
+                    )
                     .setEmail(thisUser.getEmail())
                     .build();
 
@@ -108,9 +125,9 @@ public class StripeService {
         User organizerUser = uOrganizer.get();
 
         //METADATA
-        Map<String, String> metadatosCita = new HashMap<>();
-        metadatosCita.put(StripeController.METADATA_JOURNEY_ID, thisJourney.getId());
-        metadatosCita.put(StripeController.METADATA_PARTICIPANT_ID, thisUser.getId());
+        Map<String, String> metadatos = new HashMap<>();
+        metadatos.put(StripeController.METADATA_JOURNEY_ID, thisJourney.getId());
+        metadatos.put(StripeController.METADATA_PARTICIPANT_ID, thisUser.getId());
 
         //PAYMENT METHODS
         List<String> listaMetodosPago = new ArrayList<>();
@@ -125,12 +142,11 @@ public class StripeService {
                         .setApplicationFeeAmount(0L)
                         .setCurrency("eur")
                         .addAllPaymentMethodType(listaMetodosPago)
-                        .setDescription("Appointment.")
-                        .putAllMetadata(metadatosCita)
-                        /*.setApplicationFeeAmount()*/
+                        .setDescription("Journey.")
+                        .putAllMetadata(metadatos)
                         .build();
 
-        //REQUEST OPTIONS - Asignacion del propietario de la cita
+        //REQUEST OPTIONS
         RequestOptions requestOptions =
                 RequestOptions.builder()
                         .setStripeAccount(organizerUser.getStripeAccount())
@@ -139,7 +155,7 @@ public class StripeService {
         // Create a PaymentIntent with the order amount and currency
         PaymentIntent paymentIntent = PaymentIntent.create(params, requestOptions);
 
-        return new CreatePaymentResponse(paymentIntent.getClientSecret(), paymentIntent.getId());
+        return new CreatePaymentResponse(paymentIntent.getClientSecret());
     }
 
 
