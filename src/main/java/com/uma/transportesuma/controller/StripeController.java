@@ -90,10 +90,10 @@ public class StripeController {
             );
         } catch (JsonSyntaxException e) {
             // Invalid payload.
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Json Syntax error", HttpStatus.BAD_REQUEST);
         } catch (SignatureVerificationException e) {
             // Invalid Signature.
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Signature Verification error", HttpStatus.BAD_REQUEST);
         }
 
         if ("payment_intent.succeeded".equals(event.getType())) {
@@ -112,7 +112,7 @@ public class StripeController {
 
                 try {
                     Journey journey = journeyService.findJourneyById(journeyId).get();
-                    User user = userService.findUser(thisParticipantId).get();
+                    User user = userService.findUserById(thisParticipantId).get();
 
                     this.journeyService.addParticipant(journey, user);
                 } catch(Exception ex){
