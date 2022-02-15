@@ -149,7 +149,7 @@ const app = new Vue({
                 elements: this.stripeElements,
                 confirmParams: {
                     // Make sure to change this to your payment completion page
-                    return_url: "http://localhost:5500/",
+                    return_url: "https://share-travel-pr4.herokuapp.com/your-travels.html",
                 },
             });
 

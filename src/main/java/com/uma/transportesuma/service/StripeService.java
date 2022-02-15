@@ -170,8 +170,8 @@ public class StripeService {
         AccountLinkCreateParams params = AccountLinkCreateParams
                 .builder()
                 .setAccount(accountId)
-                .setRefreshUrl("http://localhost:5500/")
-                .setReturnUrl("http://localhost:5500/")
+                .setRefreshUrl("https://share-travel-pr4.herokuapp.com/profile.html")
+                .setReturnUrl("https://share-travel-pr4.herokuapp.com/profile.html")
                 .setType(AccountLinkCreateParams.Type.ACCOUNT_ONBOARDING)
                 .build();
         AccountLink accountLink = AccountLink.create(params);
@@ -185,7 +185,7 @@ public class StripeService {
     private String createLoginLink(String accountId) throws StripeException {
         LoginLinkCreateOnAccountParams params = LoginLinkCreateOnAccountParams
                 .builder()
-                .setRedirectUrl("http://localhost:5500/")
+                .setRedirectUrl("https://share-travel-pr4.herokuapp.com/profile.html")
                 .build();
 
         LoginLink loginLink = LoginLink.createOnAccount(accountId, params, null);
