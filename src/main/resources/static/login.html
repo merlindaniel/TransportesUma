@@ -33,6 +33,45 @@
   <script src="./vue/node_modules/vue-cookies/vue-cookies.js" defer></script>
   <script src="./js/paths.js" defer></script>
   <script src="./js/login.js" defer></script>
+  <script>
+    async function ejecutar(id_token){
+      console.log(id_token);
+      let response = await fetch('/authentication/user/google/oauth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id_token: id_token
+        })
+      });
+
+      if(response.status === 200){
+        console.log("------DEVUELTO 200");
+        let data = await response.json();
+        console.log(data);
+        Vue.$cookies.set('TokenJWT', data.jwttoken);
+        window.location.href = frontendPaths.pathIndex;
+      } else {
+        console.log("------DEVUELTO OTRO");
+      }
+
+    }
+
+    async function onSignIn(googleUser) {
+      let profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName());
+      console.log('Image URL: ' + profile.getImageUrl());
+      console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+      let id_token = googleUser.getAuthResponse().id_token;
+
+      ejecutar(id_token);
+
+    }
+
+  </script>
   <meta name="google-signin-client_id" content="634135800903-t4lnnd9m66u3lr82d4h4ncat75qbt1br.apps.googleusercontent.com">
   <script src="https://apis.google.com/js/platform.js" async defer></script>
 </head>
@@ -838,46 +877,7 @@
 
   <!-- Template Main JS File -->
   <script src="assets/js/main.js"></script>
-  <script>
-    async function ejecutar(id_token){
-        console.log(id_token);
-        let response = await fetch('/authentication/user/google/oauth', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id_token: id_token
-            })
-        });
 
-        if(response.status === 200){
-            console.log("------DEVUELTO 200");
-            let data = await response.json();
-            console.log(data);
-            Vue.$cookies.set('TokenJWT', data.jwttoken);
-            window.location.href = frontendPaths.pathIndex;
-        } else {
-            console.log("------DEVUELTO OTRO");
-        }
-
-    }
-
-    async function onSignIn(googleUser) {
-        let profile = googleUser.getBasicProfile();
-        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
-        console.log('Name: ' + profile.getName());
-        console.log('Image URL: ' + profile.getImageUrl());
-        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
-
-        let id_token = googleUser.getAuthResponse().id_token;
-        
-        ejecutar(id_token);
-
-    }
-
-    
-</script>
 </body>
 
 </html>
