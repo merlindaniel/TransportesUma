@@ -125,7 +125,7 @@ public class UserService {
         mailSender.setPort(587);
 
         mailSender.setUsername("sharetravel.official@gmail.com");
-        mailSender.setPassword("ebxpixodfbkksbpo");
+        mailSender.setPassword("secret");
         MailSSLSocketFactory sf = new MailSSLSocketFactory();
         sf.setTrustAllHosts(true);
 
@@ -139,7 +139,7 @@ public class UserService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("sharetravel.official@gmail.com");
-        message.setTo("merlindaniel30@gmail.com");
+        message.setTo("secret@gmail.com");
         message.setSubject("Prueba subject");
         message.setText("Prueba texto");
         mailSender.send(message);
