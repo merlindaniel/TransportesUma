@@ -82,7 +82,7 @@ public class StripeController {
             @RequestBody String payload,
             @RequestHeader("Stripe-Signature") String sigHeader){
 
-        String endpointSecret = "whsec_nWT2OWu7s45Bh703OACuXOx09WEEInLo";
+        String endpointSecret = "whsec_secret";
         Event event = null;
         try {
             event = Webhook.constructEvent(
