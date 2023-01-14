@@ -34,7 +34,7 @@ public class TransportesumaApplication {
 
     @PostConstruct
     public void setup(){
-        Stripe.apiKey="sk_test_51KT4GvD15nb6EUWAR6Npgs5ja93X3FN4t9R45EgbC4gN7pAPuTwoy6dZdN8rpZG7ZYByYWdp8NJvGHKoGscmsFvo003iuWe5n0";
+        Stripe.apiKey="sk_test_PRIVATEKEYSTRIPE";
     }
 
 
